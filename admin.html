@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- CSP FINAL FUNCIONAL -->
+<meta http-equiv="Content-Security-Policy" 
+      content="default-src 'self';
+               script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.gstatic.com https://apis.google.com;
+               style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+               font-src 'self' https://fonts.gstatic.com;
+               img-src 'self' data: https:;
+               connect-src 'self' 
+                 https://www.gstatic.com 
+                 https://firestore.googleapis.com 
+                 https://identitytoolkit.googleapis.com 
+                 https://www.googleapis.com 
+                 https://cafelaesperanza-231a4.firebaseapp.com
+                 https://securetoken.googleapis.com;
+               frame-src 'self' 
+                 https://cafelaesperanza-231a4.firebaseapp.com 
+                 https://apis.google.com;">
+
+  <!-- Headers que SÍ funcionan en meta tags -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Panel de administración Café Valdore - Gestión completa de productos, pedidos, usuarios y configuración de la tienda online de cafés especiales.">
+  <title>Panel de Administración - Café Valdore</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <!-- Header con menú responsive -->
+  <header>
+    <nav>
+      <a href="index.html" class="logo">
+  <img src="logo.webp" alt="Café Valdore" style="height: 120px;">
+</a>
+      
+      <!-- Menú desktop -->
+      <ul class="nav-links">
+        <li><a href="index.html">🏠 Inicio</a></li>
+        <li><a href="admin.html" class="active">⚙️ Administración</a></li>
+        <li><button id="authBtn" class="auth-btn">🚪 Cerrar Sesión</button></li>
+      </ul>
+
+      <!-- Botón hamburguesa -->
+      <div class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </nav>
+
+    <!-- Menú móvil -->
+    <div class="mobile-menu" id="mobileMenu">
+      <ul>
+        <li><a href="index.html">🏠 Inicio</a></li>
+        <li><a href="admin.html" class="active">⚙️ Administración</a></li>
+        <li><button id="authMobileBtn" class="auth-btn">🚪 Cerrar Sesión</button></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Contenido principal -->
+  <main class="admin-container">
+    <div class="admin-header">
+      <h1>⚙️ Panel de Administración</h1>
+      <p>Gestiona pedidos y mensajes de contacto</p>
+    </div>
+
+    <div class="admin-stats">
+      <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <div class="stat-info">
+          <h3 id="totalPedidos">0</h3>
+          <p>Pedidos Totales</p>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-info">
+          <h3 id="pedidosPendientes">0</h3>
+          <p>Pendientes</p>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">📩</div>
+        <div class="stat-info">
+          <h3 id="totalMensajes">0</h3>
+          <p>Mensajes</p>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">👤</div>
+        <div class="stat-info">
+          <h3 id="totalClientes">0</h3>
+          <p>Clientes</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-content">
+      <!-- TABS REESTRUCTURADOS CON BOTÓN DE ACTUALIZAR -->
+      <div class="admin-tabs-container">
+        <div class="admin-tabs">
+          <button class="tab-btn active" data-tab="pedidos">📦 Pedidos</button>
+          <button class="tab-btn" data-tab="mensajes">📩 Mensajes</button>
+          <button class="tab-btn" data-tab="chat">💬 Chat Clientes</button>
+        </div>
+        
+        <div class="admin-actions">
+          <button id="btnActualizar" class="btn-actualizar-tabs">🔄 Actualizar</button>
+        </div>
+      </div>
+
+      <div class="tab-content">
+        <!-- Panel de Pedidos -->
+        <div id="tab-pedidos" class="tab-pane active">
+          <!-- FILTROS SIMPLIFICADOS SIN BOTÓN -->
+          <div class="filtros-pedidos-simple">
+            <select id="filtroEstado">
+              <option value="todos">Todos los estados</option>
+              <option value="pendiente">Pendientes</option>
+              <option value="en-proceso">En proceso</option>
+              <option value="completado">Completados</option>
+            </select>
+            <input type="date" id="filtroFecha" placeholder="Filtrar por fecha">
+          </div>
+
+          <div class="pedidos-list" id="listaPedidosAdmin">
+            <div class="loading">Cargando pedidos...</div>
+          </div>
+        </div>
+
+        <!-- Panel de Mensajes -->
+        <div id="tab-mensajes" class="tab-pane">
+          <div class="mensajes-list" id="listaMensajesAdmin">
+            <div class="loading">Cargando mensajes...</div>
+          </div>
+        </div>
+
+        <!-- Panel de Chat -->
+        <div id="tab-chat" class="tab-pane">
+          <div class="chat-admin-container">
+            <div class="conversaciones-sidebar">
+              <div class="sidebar-header">
+                <h3>💬 Conversaciones</h3>
+                <button id="actualizarConversaciones" class="btn-actualizar-small">🔄</button>
+              </div>
+              
+              <div class="conversaciones-filtros">
+                <input type="text" id="buscarConversacion" placeholder="Buscar cliente...">
+                <select id="filtroConversacionesEstado">
+                  <option value="todas">Todas</option>
+                  <option value="activas">Activas</option>
+                  <option value="sin-responder">Sin responder</option>
+                </select>
+              </div>
+              
+              <div class="conversaciones-lista" id="conversacionesLista">
+                <div class="loading-conversaciones">Cargando conversaciones...</div>
+              </div>
+            </div>
+            
+            <div class="chat-area">
+              <div class="chat-header" id="chatHeader">
+                <div class="cliente-info">
+                  <h4 id="clienteNombre">Selecciona una conversación</h4>
+                  <span id="clienteEmail"></span>
+                </div>
+                <div class="chat-status" id="chatStatus">
+                  <span class="status-indicator"></span>
+                </div>
+              </div>
+              
+              <div class="chat-messages" id="chatMessages">
+                <div class="chat-welcome">
+                  <p>👋 Selecciona una conversación para comenzar a chatear con tus clientes</p>
+                </div>
+              </div>
+              
+              <div class="chat-input-container" id="chatInputContainer" style="display: none;">
+                <div class="chat-input-area">
+                  <textarea id="mensajeAdmin" placeholder="Escribe tu mensaje..." rows="2"></textarea>
+                  <button id="enviarMensajeAdmin" class="btn-enviar">📤 Enviar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal para editar pedido -->
+  <div id="modalPedido" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Editar Pedido</h2>
+        <span class="close">&times;</span>
+      </div>
+      <div class="modal-body" id="modalPedidoBody">
+        <!-- Contenido dinámico -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+<script type="module" src="auth-guard.js"></script>
+<script type="module" src="admin.js"></script>
+<script type="module" src="admin-chat.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!-- CSP FINAL FUNCIONAL -->
+<meta http-equiv="Content-Security-Policy" 
+      content="default-src 'self';
+               script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.gstatic.com https://apis.google.com;
+               style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+               font-src 'self' https://fonts.gstatic.com;
+               img-src 'self' data: https:;
+               connect-src 'self' 
+                 https://www.gstatic.com 
+                 https://firestore.googleapis.com 
+                 https://identitytoolkit.googleapis.com 
+                 https://www.googleapis.com 
+                 https://cafelaesperanza-231a4.firebaseapp.com
+                 https://securetoken.googleapis.com;
+               frame-src 'self' 
+                 https://cafelaesperanza-231a4.firebaseapp.com 
+                 https://apis.google.com;">
+
+  <!-- Headers que SÍ funcionan en meta tags -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Conoce la historia de Café Valdore - Más de 20 años de pasión por el café especial. Desde nuestros inicios familiares hasta convertirnos en referencia de calidad.">
+  <title>Nuestra Historia - Café Valdore</title>
+
+  <!-- Preload de CSS para mejorar rendimiento -->
+  <link rel="preload" href="styles.css" as="style">
+
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="carrito.css">
+  <link rel="stylesheet" href="cerrarcarrito.css">
+  <link rel="stylesheet" href="historia.css">
+  <link rel="stylesheet" href="contacto.css">
+  <link rel="stylesheet" href="formulario.css">
+</head>
+<body>
+  <!-- Header con menú responsive -->
+  <header>
+    <nav>
+      <a href="index.html" class="logo">
+  <img src="logo.webp" alt="Café Valdore" style="height: 120px;">
+</a>
+      
+      <!-- Menú desktop -->
+      <ul class="nav-links">
+        <li><a href="index.html">🏠 Inicio</a></li>
+        <li><a href="historia.html">📖 Nuestra Historia</a></li>
+        <li><a href="pedidos.html">📦 Mis Pedidos</a></li>
+        <li><a href="contacto.html">📞 Contáctanos</a></li>
+        <li><button id="carritoBtn" class="cart-btn">🛒 Carrito</button></li>
+        <li><button id="authBtn" class="auth-btn">🔑 Iniciar Sesión</button></li>
+      </ul>
+
+      <!-- Botón hamburguesa -->
+      <div class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </nav>
+
+    <!-- Menú móvil -->
+    <div class="mobile-menu" id="mobileMenu">
+      <ul>
+        <li><a href="index.html">🏠 Inicio</a></li>
+        <li><a href="historia.html">📖 Nuestra Historia</a></li>
+        <li><a href="pedidos.html">📦 Mis Pedidos</a></li>
+        <li><a href="contacto.html">📞 Contáctanos</a></li>
+        <li><button id="carritoMobileBtn" class="cart-btn">🛒 Carrito</button></li>
+        <li><button id="authMobileBtn" class="auth-btn">🔑 Iniciar Sesión</button></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Contenido principal -->
+  <main>
+    <div id="userWelcome" class="user-info" style="display: none;">
+      <p>¡<span id="userName"></span>, así nace el mejor café! 👋</p>
+    </div>
+
+    <section class="historia">
+      <h2>Nuestra Historia ☕</h2>
+      
+      <div class="historia-content">
+        <div class="historia-section">
+          <h3>🌄 Nuestros Orígenes</h3>
+          <p>
+            Café Valdore nace en el corazón del sur del Huila, en el Valle de Laboyos, Pitalito. 
+            Una tierra bendecida por la naturaleza, donde las montañas abrazan el cielo y la brisa 
+            matutina despierta los cafetales con el aroma más puro. Desde hace más de tres generaciones, 
+            nuestra familia ha cultivado café con pasión, respeto y dedicación.
+          </p>
+        </div>
+
+        <div class="historia-section">
+          <h3>🌱 Nuestro Compromiso</h3>
+          <p>
+            Cada grano es cultivado con esmero, cosechado a mano y procesado con los más altos 
+            estándares de calidad. No utilizamos químicos dañinos, respetamos el medio ambiente 
+            y trabajamos en armonía con la naturaleza. Nuestro café no solo es una bebida, 
+            es un sentimiento que compartimos con cada taza que llega a tu hogar.
+          </p>
+        </div>
+
+        <div class="historia-section">
+          <h3>🏆 La Excelencia del Huila</h3>
+          <p>
+            El Huila es reconocido mundialmente por producir algunos de los mejores cafés especiales 
+            del planeta. Nuestras variedades Bourbon Rosado y Caturra han sido seleccionadas 
+            cuidadosamente para ofrecerte perfiles únicos de sabor: desde notas frutales y dulces 
+            hasta cuerpos balanceados con acidez brillante que despiertan todos tus sentidos.
+          </p>
+        </div>
+      </div>
+
+      <!-- Estadísticas -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number">3</div>
+          <div class="stat-label">Generaciones</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">25</div>
+          <div class="stat-label">Años de Experiencia</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">100%</div>
+          <div class="stat-label">Café Especial</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">2</div>
+          <div class="stat-label">Variedades Premium</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Overlay del carrito -->
+  <div class="carrito-overlay" id="carritoOverlay"></div>
+
+  <!-- Carrito lateral -->
+  <aside id="carrito" class="carrito-sidebar">
+    <button id="cerrarCarrito" class="cerrarBtn">X</button>
+    <h2>Tu Carrito 🛒</h2>
+    <ul id="listaCarrito"></ul>
+    <p id="totalCarrito">Total: $0</p>
+    <button id="guardarPedido" class="btn-confirmar">
+      ✅ Confirmar Pedido
+    </button>
+    <button id="vaciarCarrito" class="btn-vaciar">
+      🗑️ Vaciar Carrito
+    </button>
+  </aside>
+
+  <!-- Footer -->
+  <footer class="footer-contacto">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>☕ Café Valdore</h3>
+        <p>Desde el Valle de Laboyos, cultivamos y procesamos café de la más alta calidad para los amantes del buen café.</p>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Enlaces Rápidos</h4>
+        <ul>
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="historia.html">Nuestra Historia</a></li>
+          <li><a href="pedidos.html">Mis Pedidos</a></li>
+          <li><a href="contacto.html">Contáctanos</a></li>
+        </ul>
+      </div>
+      
+     <div class="footer-section">
+        <h4>Redes Sociales</h4>
+        <div class="social-links">
+          <a href="https://www.facebook.com/profile.php?id=61580621437211" target="_blank">
+  <img src="https://img.shields.io/badge/Facebook-094293?style=for-the-badge&logo=facebook&logoColor=white" alt="Sígueme en Facebook"></a>
+          <a href="https://www.instagram.com/cafevaldore/" target="_blank">
+  <img src="https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white" alt="Sígueme en Instagram"></a>
+<a href="mailto:cafevaldore@gmail.com" target="_blank">
+  <img src="https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email me">
+</a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <p>&copy; 2025 Café Valdore. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+    <!-- Chat flotante para comunicación con administrador -->
+  <div class="chat-container" id="chatContainer">
+    <button class="chat-toggle" id="chatToggle">
+      💬
+      <span class="chat-badge" id="chatBadge">0</span>
+    </button>
+    
+    <div class="chat-window" id="chatWindow">
+      <div class="chat-header">
+        <h3>💬 Chat con Café Valdore</h3>
+        <button class="chat-close" id="chatClose">&times;</button>
+      </div>
+      
+      <div class="chat-messages" id="chatMessages">
+        <!-- Los mensajes se cargarán aquí dinámicamente -->
+        <div class="chat-welcome">
+          <p>¡Hola! ¿En qué podemos ayudarte?</p>
+          <p>Estamos aquí para responder tus preguntas sobre nuestros productos, pedidos o cualquier consulta que tengas.</p>
+        </div>
+      </div>
+      
+      <div class="chat-input">
+        <textarea id="mensajeChat" placeholder="Escribe tu mensaje aquí..." rows="2"></textarea>
+        <button id="enviarMensajeChat">📤</button>
+      </div>
+    </div>
+  </div>
+  <!-- Mensaje para usuarios no autenticados en chat-->
+    <div id="loginChat" class="login-required" style="display: none;">
+      <div class="message-box">
+        <h3>🔐 Inicia sesión para chatear</h3>
+        <p>Para poder usar el chat de café valdore, necesitas tener una cuenta.</p>
+        <button onclick="window.location.href='auth.html'" class="login-prompt-btn">
+          Iniciar Sesión / Registrarse
+        </button>
+      </div>
+    </div>
+  <!-- Cargar scripts en el orden correcto -->
+<!-- ✅ CORRECTO -->
+<script type="module" src="main.js"></script>
+<script type="module" src="chat.js"></script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('✅ SW registrado'))
+      .catch(err => console.log('❌ SW error:', err));
+  });
+}
+</script>
+</script>
+
+</body>
+</html>

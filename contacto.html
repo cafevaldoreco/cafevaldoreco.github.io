@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+
+  <!-- CSP CORREGIDO PARA GOOGLE MAPS -->
+<meta http-equiv="Content-Security-Policy" 
+      content="default-src 'self';
+               script-src 'self' 'unsafe-eval' 'unsafe-inline' 
+                 https://www.gstatic.com 
+                 https://apis.google.com 
+                 https://maps.googleapis.com
+                 https://maps.gstatic.com;
+               style-src 'self' 'unsafe-inline' 
+                 https://fonts.googleapis.com;
+               font-src 'self' 
+                 https://fonts.gstatic.com;
+               img-src 'self' data: https: blob:;
+               connect-src 'self' 
+                 https://www.gstatic.com 
+                 https://firestore.googleapis.com 
+                 https://identitytoolkit.googleapis.com 
+                 https://www.googleapis.com 
+                 https://maps.googleapis.com
+                 https://cafelaesperanza-231a4.firebaseapp.com
+                 https://securetoken.googleapis.com;
+               frame-src 'self' 
+                 https://www.google.com
+                 https://maps.google.com
+                 https://www.google.com/maps/
+                 https://cafelaesperanza-231a4.firebaseapp.com 
+                 https://apis.google.com;
+               child-src https://www.google.com https://maps.google.com;">
+                 
+  <!-- Headers de seguridad -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Contacta a Café Valdore - WhatsApp, correo electrónico y redes sociales. Atención personalizada, asesoramiento en cafés especiales y soporte al cliente.">
+  <title>Contacto - Café Valdore</title>
+
+<!-- Preload de CSS para mejorar rendimiento -->
+  <link rel="preload" href="styles.css" as="style">
+
+
+   <link rel="stylesheet" href="contacto.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="carrito.css">
+  <link rel="stylesheet" href="cerrarcarrito.css">
+  <link rel="stylesheet" href="formulario.css">
+</head>
+<body>
+  <!-- Header con menú responsive -->
+  <header>
+    <nav>
+     <a href="index.html" class="logo">
+  <img src="logo.webp" alt="Café Valdore" style="height: 120px;">
+</a>
+      
+      <!-- Menú desktop -->
+      <ul class="nav-links">
+        <li><a href="index.html">🏠 Inicio</a></li>
+        <li><a href="historia.html">📖 Nuestra Historia</a></li>
+        <li><a href="pedidos.html">📦 Mis Pedidos</a></li>
+        <li><a href="contacto.html" class="active">📞 Contáctanos</a></li>
+        <li><button id="carritoBtn" class="cart-btn">🛒 Carrito</button></li>
+        <li><button id="authBtn" class="auth-btn">🔑 Iniciar Sesión</button></li>
+      </ul>
+
+      <!-- Botón hamburguesa -->
+      <div class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </nav>
+
+    <!-- Menú móvil -->
+    <div class="mobile-menu" id="mobileMenu">
+      <ul>
+        <li><a href="index.html">🏠 Inicio</a></li>
+        <li><a href="historia.html">📖 Nuestra Historia</a></li>
+        <li><a href="pedidos.html">📦 Mis Pedidos</a></li>
+        <li><a href="contacto.html" class="active">📞 Contáctanos</a></li>
+        <li><button id="carritoMobileBtn" class="cart-btn">🛒 Carrito</button></li>
+        <li><button id="authMobileBtn" class="auth-btn">🔑 Iniciar Sesión</button></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Contenido principal -->
+  <main>
+    <section class="contacto-hero">
+      <div class="hero-content">
+        <h1>📞 Contáctanos</h1>
+        <p>Estamos aquí para servirte. ¡Hablemos sobre café!</p>
+      </div>
+    </section>
+
+<div class="contacto-container">
+  <!-- Columna izquierda (información de contacto) -->
+  <div class="contacto-info">
+    <div class="info-card">
+      <div class="info-icon">📍</div>
+      <h3>Nuestra Ubicación</h3>
+      <p>Valle de Laboyos, Pitalito - Huila, Colombia</p>
+      <a href="https://maps.app.goo.gl/WmAuCs1KUufksX1DA" target="_blank" class="btn-link">Ver en Google Maps</a>
+    </div>
+
+    <div class="info-card">
+      <div class="info-icon">📱</div>
+      <h3>Teléfonos</h3>
+      <p>+57 301 4518 350</p>
+      <p>+57 314 4678600</p>
+      <a href="https://wa.me/573014518350" target="_blank" class="btn-link">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width: 20px; height: 20px; fill: currentColor; vertical-align: middle;">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+  </svg>
+  Escribir por WhatsApp
+</a>
+    </div>
+
+    <div class="info-card">
+      <div class="info-icon">✉️</div>
+      <h3>Correo Electrónico</h3>
+      <p>cafevaldore@gmail.com</p>
+      <a href="mailto:cafevaldore@gmail.com" class="btn-link">Enviar correo</a>
+    </div>
+  </div>
+  
+ <div class="contacto-formulario">
+        <h2>📩 Envíanos un mensaje</h2>
+        <form id="formularioContacto">
+          <div class="form-group">
+            <input type="text" id="nombreContacto" placeholder="Nombre completo" required>
+          </div>
+          
+          <div class="form-group">
+            <input type="email" id="emailContacto" placeholder="Correo electrónico" required>
+          </div>
+          
+          <div class="form-group">
+            <input type="tel" id="telefonoContacto" placeholder="Teléfono (opcional)">
+          </div>
+          
+          <div class="form-group">
+            <select id="asuntoContacto" required>
+              <option value="">Selecciona el asunto</option>
+              <option value="pedido">Información sobre pedidos</option>
+              <option value="producto">Consulta sobre productos</option>
+              <option value="distribucion">Oportunidades de distribución</option>
+              <option value="otros">Otros asuntos</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <textarea id="mensajeContacto" placeholder="Escribe tu mensaje aquí..." rows="5" required></textarea>
+          </div>
+          
+          <button type="submit" class="btn-enviar">📤 Enviar Mensaje</button>
+        </form>
+      </div>
+    
+    <div class="info-card horario-card">
+      <div class="info-icon">🕒</div>
+      <h3>Horario de Atención</h3>
+      <p>Lunes a Viernes: 7:00 AM - 6:00 PM</p>
+      <p>Sábados: Cerrado</p>
+      <p>Domingos: Cerrado</p>
+    </div>
+  </div>
+</div>
+
+<section class="mapa-section">
+  <h2>📍 ¿Dónde encontrarnos?</h2>
+  <div class="mapa-container">
+    <!-- Mapa de Google Maps (iframe) -->
+    <div class="mapa">
+      <iframe 
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3984.2242895082!2d-76.0670119!3d1.906771!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e250de65cf8e135%3A0x7e827c50a357aa91!2sCaf%C3%A9%20Valdore!5e0!3m2!1ses!2sco!4v1726000000000!5m2!1ses!2sco" 
+        width="100%" 
+        height="400" 
+        style="border:0;" 
+        allowfullscreen="" 
+        loading="lazy" 
+        referrerpolicy="no-referrer-when-downgrade"
+        title="Ubicación de Café Valdore">
+      </iframe>
+    </div>
+  </div>
+</section>
+
+    <section class="preguntas-frecuentes">
+      <h2>❓ Preguntas Frecuentes</h2>
+      <div class="faq-container">
+        <div class="faq-item">
+          <div class="faq-pregunta">
+            <h3>¿Hacen envíos a todo Colombia?</h3>
+            <span class="faq-toggle">+</span>
+          </div>
+          <div class="faq-respuesta">
+            <p>Sí, realizamos envíos a todo el territorio colombiano. El tiempo de entrega varía según la ubicación, generalmente entre 2-5 días hábiles.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-pregunta">
+            <h3>¿Qué métodos de pago aceptan?</h3>
+            <span class="faq-toggle">+</span>
+          </div>
+          <div class="faq-respuesta">
+            <p>Aceptamos transferencias bancarias, pago contra entrega y a través de plataformas como Nequi.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-pregunta">
+            <h3>¿Ofrecen muestras de sus productos?</h3>
+            <span class="faq-toggle">+</span>
+          </div>
+          <div class="faq-respuesta">
+            <p>Sí, ofrecemos muestras para negocios y distribuidores potenciales. Contáctanos para coordinar el envío de muestras según tu ubicación.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-pregunta">
+            <h3>¿Tienen punto de venta físico?</h3>
+            <span class="faq-toggle">+</span>
+          </div>
+          <div class="faq-respuesta">
+            <p>Actualmente operamos principalmente online, pero puedes visitarnos en nuestra finca en Pitalito, Huila, con cita previa.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer-contacto">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>☕ Café Valdore</h3>
+        <p>Desde el Valle de Laboyos, cultivamos y procesamos café de la más alta calidad para los amantes del buen café.</p>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Enlaces Rápidos</h4>
+        <ul>
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="historia.html">Nuestra Historia</a></li>
+          <li><a href="pedidos.html">Mis Pedidos</a></li>
+          <li><a href="contacto.html">Contáctanos</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Redes Sociales</h4>
+        <div class="social-links">
+          <a href="https://www.facebook.com/profile.php?id=61580621437211" target="_blank">
+  <img src="https://img.shields.io/badge/Facebook-094293?style=for-the-badge&logo=facebook&logoColor=white" alt="Sígueme en Instagram"></a>
+          <a href="https://www.instagram.com/cafevaldore/" target="_blank">
+  <img src="https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white" alt="Sígueme en Instagram"></a>
+<a href="mailto:cafevaldore@gmail.com" target="_blank">
+  <img src="https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email me">
+</a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <p>&copy; 2025 Café Valdore. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- Overlay del carrito -->
+  <div class="carrito-overlay" id="carritoOverlay"></div>
+
+  <!-- Carrito lateral -->
+  <aside id="carrito" class="carrito-sidebar">
+    <button id="cerrarCarrito" class="cerrarBtn">X</button>
+    <h2>Tu Carrito 🛒</h2>
+    <ul id="listaCarrito"></ul>
+    <p id="totalCarrito">Total: $0</p>
+    <button id="guardarPedido" class="btn-confirmar">
+      ✅ Confirmar Pedido
+    </button>
+    <button id="vaciarCarrito" class="btn-vaciar">
+      🗑️ Vaciar Carrito
+    </button>
+  </aside>
+
+  <!-- Chat flotante para comunicación con administrador -->
+  <div class="chat-container" id="chatContainer">
+    <button class="chat-toggle" id="chatToggle">
+      💬
+      <span class="chat-badge" id="chatBadge">0</span>
+    </button>
+    
+    <div class="chat-window" id="chatWindow">
+      <div class="chat-header">
+        <h3>💬 Chat con Café Valdore</h3>
+        <button class="chat-close" id="chatClose">&times;</button>
+      </div>
+      
+      <div class="chat-messages" id="chatMessages">
+        <!-- Los mensajes se cargarán aquí dinámicamente -->
+        <div class="chat-welcome">
+          <p>¡Hola! ¿En qué podemos ayudarte?</p>
+          <p>Estamos aquí para responder tus preguntas sobre nuestros productos, pedidos o cualquier consulta que tengas.</p>
+        </div>
+      </div>
+      
+      <div class="chat-input">
+        <textarea id="mensajeChat" placeholder="Escribe tu mensaje aquí..." rows="2"></textarea>
+        <button id="enviarMensajeChat">📤</button>
+      </div>
+    </div>
+  </div>
+<!-- Mensaje para usuarios no autenticados en chat-->
+    <div id="loginChat" class="login-required" style="display: none;">
+      <div class="message-box">
+        <h3>🔐 Inicia sesión para chatear</h3>
+        <p>Para poder usar el chat de café valdore, necesitas tener una cuenta.</p>
+        <button onclick="window.location.href='auth.html'" class="login-prompt-btn">
+          Iniciar Sesión / Registrarse
+        </button>
+      </div>
+    </div>
+  <!-- Scripts -->
+<!-- ✅ MANTENER -->
+<script type="module" src="main.js"></script>
+<script type="module" src="chat.js"></script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('✅ SW registrado'))
+      .catch(err => console.log('❌ SW error:', err));
+  });
+}
+</script>
+</body>
+</html>

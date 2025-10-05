@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- CSP FINAL FUNCIONAL -->
+<meta http-equiv="Content-Security-Policy" 
+      content="default-src 'self';
+               script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.gstatic.com https://apis.google.com;
+               style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+               font-src 'self' https://fonts.gstatic.com;
+               img-src 'self' data: https:;
+               connect-src 'self' 
+                 https://www.gstatic.com 
+                 https://firestore.googleapis.com 
+                 https://identitytoolkit.googleapis.com 
+                 https://www.googleapis.com 
+                 https://cafelaesperanza-231a4.firebaseapp.com
+                 https://securetoken.googleapis.com;
+               frame-src 'self' 
+                 https://cafelaesperanza-231a4.firebaseapp.com 
+                 https://apis.google.com;">
+
+  <!-- Headers de seguridad -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Café Valdore - Descubre nuestros cafés especiales de origen. Granos premium tostados y molidos. Envíos a todo el país.">
+  <title>Café Valdore - Café Especial del Huila</title>
+
+  <!-- ✅ Preconnect OPTIMIZADO - Solo los más críticos -->
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://firestore.googleapis.com">
+  <link rel="dns-prefetch" href="https://img.shields.io">
+
+  <!-- ✅ Preload SOLO recursos CRÍTICOS (visibles en viewport inicial) -->
+  <link rel="preload" href="styles.css" as="style">
+  <link rel="preload" href="logo.webp" as="image" type="image/webp">
+  
+  <!-- CSS crítico inline para evitar render-blocking -->
+  <style>
+    /* CSS crítico para evitar FOUC */
+    body { margin: 0; font-family: system-ui, -apple-system, sans-serif; }
+    header { background: #2c1810; position: sticky; top: 0; z-index: 1000; }
+    .presentacion { min-height: 200px; }
+    /* Skeleton loading para productos */
+    .productos-grid { display: grid; gap: 2rem; }
+    @media (min-width: 768px) { .productos-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .productos-grid { grid-template-columns: repeat(3, 1fr); } }
+  </style>
+
+  <!-- CSS completo (será cacheado por el SW) -->
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="formulario.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="carrito.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="cerrarcarrito.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="contacto.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="productos.css" media="print" onload="this.media='all'">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+</head>
+<body>
+  <!-- Header con menú responsive -->
+  <header>
+    <nav>
+      <a href="#" class="logo">
+        <!-- LOGO SIN LAZY LOADING (es crítico y visible inmediatamente) -->
+        <img src="logo.webp" alt="Café Valdore" style="height: 120px;">
+      </a>
+      
+      <!-- Menú desktop -->
+      <ul class="nav-links">
+        <li><a href="index.html">🏠 Inicio</a></li>
+        <li><a href="historia.html">📖 Nuestra Historia</a></li>
+        <li><a href="pedidos.html">📦 Mis Pedidos</a></li>
+        <li><a href="contacto.html">📞 Contáctanos</a></li>
+        <li><button id="carritoBtn" class="cart-btn">🛒 Carrito</button></li>
+        <li><button id="authBtn" class="auth-btn">🔑 Iniciar Sesión</button></li>
+      </ul>
+
+      <!-- Botón hamburguesa -->
+      <div class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </nav>
+
+    <!-- Menú móvil -->
+    <div class="mobile-menu" id="mobileMenu">
+      <ul>
+        <li><a href="index.html">🏠 Inicio</a></li>
+        <li><a href="historia.html">📖 Nuestra Historia</a></li>
+        <li><a href="pedidos.html">📦 Mis Pedidos</a></li>
+        <li><a href="contacto.html">📞 Contáctanos</a></li>
+        <li><button id="carritoMobileBtn" class="cart-btn">🛒 Carrito</button></li>
+        <li><button id="authMobileBtn" class="auth-btn">🔑 Iniciar Sesión</button></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Presentación -->
+  <main>
+    <section class="presentacion">
+      <h2>Bienvenido al Café Especial del Huila</h2>
+      <p>Desde el Valle de Laboyos, en las montañas de Pitalito-Huila, cultivamos café especial con estándares de calidad excepcionales. Cada taza cuenta la historia de nuestra tierra y dedicación.</p>
+      <div id="userWelcome" class="user-info" style="display: none;">
+        <p>¡Bienvenido,  <span id="userName"></span> tu próxima taza favorita te espera! 👋</p>
+      </div>
+    </section>
+
+    <!-- Productos -->
+    <section class="productos">
+      <h2>Nuestros Cafés Especiales</h2>
+      <div class="productos-grid">
+        <div class="producto">
+          <!-- IMAGEN CON LAZY LOADING -->
+          <img src="bourbon.webp" alt="Bourbon Rosado" loading="lazy" width="250" height="250">
+          <h3>Bourbon Rosado 500g</h3>
+          <p>Café de tueste medio, con cuerpo ligero y sedoso. Presenta un perfil frutal y floral, con notas de cereza, fresa y miel, que se combinan con una dulzura natural que envuelve el paladar. Ideal para quienes disfrutan de un café delicado, aromático y equilibrado, que despierta los sentidos sin ser agresivo.</p>
+          <button class="add-to-cart-btn" data-producto="Bourbon Rosado" data-precio="50000">
+            Agregar al Carrito • $50.000
+          </button>
+        </div>
+        <div class="producto">
+          <!-- IMAGEN CON LAZY LOADING -->
+          <img src="caturra.webp" alt="Caturra" loading="lazy" width="250" height="250">
+          <h3>Caturra 500g</h3>
+          <p>Café de tueste medio, con cuerpo medio y textura cremosa. Destaca por su equilibrio entre acidez brillante y notas dulces, acompañadas de un aroma intenso a frutos secos y cacao. Una experiencia envolvente y compleja, ideal para quienes buscan un café aromático, con carácter y un sabor persistente.</p>
+          <button class="add-to-cart-btn" data-producto="Caturra" data-precio="50000">
+            Agregar al Carrito • $50.000
+          </button>
+        </div>
+        <div class="producto">
+          <!-- IMAGEN CON LAZY LOADING -->
+          <img src="promocion.webp" alt="Promoción Bourbon + Caturra" loading="lazy" width="250" height="250">
+          <h3>Gran Promoción Bourbon + Caturra 1000g</h3>
+          <p>🔥 Descubre el balance perfecto con nuestra combinación exclusiva de Bourbon y Caturra, dos cafés de origen único que conquistan por su cuerpo medio, notas dulces y final cremoso.
+Un café premium, aromático y sofisticado para quienes disfrutan la excelencia en cada sorbo.
+</p>
+<p>🌎El café que transforma cada momento en especial.</p>
+<p>🌟 El equilibrio perfecto en cada taza</p>
+<p>☕ Dos orígenes, un sabor premium</p>
+          <button class="add-to-cart-btn" data-producto="Promoción Bourbon + Caturra" data-precio="80000">
+            Agregar al Carrito • $80.000
+          </button>
+        </div>
+        <div class="producto">
+          <!-- IMAGEN CON LAZY LOADING -->
+          <img src="superpromocion.webp" alt="Super Promoción Bourbon + Caturra X2" loading="lazy" width="250" height="250">
+          <h3>Super Promoción 2 bolsas de Bourbon + 2 bolsas de Caturra 2000g</h3>
+          <p>🔥 Lleva el doble y ahorra más con esta super promoción familiar: 2 bolsas de Bourbon y 2 bolsas de Caturra, 2000g de café selecto para que nunca falte en casa. Vive una experiencia intensa y envolvente, con aromas de frutos secos, cacao y notas brillantes que harán de cada preparación un momento especial.
+👉 Más café, más sabor, más ahorro.</p>
+<p>🔥 Más café, más sabor, más ahorro
+</p>
+<p>🎉 2 + 2: la experiencia completa del café premium</p>
+          <button class="add-to-cart-btn" data-producto="Super Promoción Bourbon + Caturra X2" data-precio="100000">
+            Agregar al Carrito • $100.000
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección de preparación de café -->
+    <section class="preparacion-cafe">
+      <h2>☕ ¿Cómo Preparar la Taza Perfecta?</h2>
+      <div class="preparacion-container">
+        <div class="preparacion-content">
+          <div class="preparacion-intro">
+            <p>Nuestro café molido está listo para preparar. Descubre los secretos para extraer todo el sabor y aroma de nuestros cafés especiales del Huila con estos métodos sencillos.</p>
+          </div>
+          
+          <div class="metodos-preparacion">
+            <div class="metodo">
+              <h3>🌟 Método de Filtro (Recomendado)</h3>
+              <div class="instrucciones">
+                <div class="paso">
+                  <span class="numero">1</span>
+                  <p><strong>Proporción:</strong> 2-3 cucharadas de café por cada 250ml de agua</p>
+                </div>
+                <div class="paso">
+                  <span class="numero">2</span>
+                  <p><strong>Temperatura:</strong> 90-94°C (deja reposar el agua hirviendo 1 minuto)</p>
+                </div>
+                <div class="paso">
+                  <span class="numero">3</span>
+                  <p><strong>Filtro:</strong> Usa filtro de papel o permanente en tu cafetera de goteo</p>
+                </div>
+                <div class="paso">
+                  <span class="numero">4</span>
+                  <p><strong>Preparación:</strong> Vierte agua lentamente sobre el café molido de manera uniforme</p>
+                </div>
+                <div class="paso">
+                  <span class="numero">5</span>
+                  <p><strong>Extracción:</strong> Deja que el agua pase completamente (4-6 minutos)</p>
+                </div>
+                <div class="paso">
+                  <span class="numero">6</span>
+                  <p><strong>Servir:</strong> Disfruta inmediatamente para mejor sabor</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="metodo">
+              <h3>☕ Método Tradicional Colombiano</h3>
+              <div class="instrucciones">
+                <div class="paso">
+                  <span class="numero">1</span>
+                  <p><strong>Proporción:</strong> 3-4 cucharadas de café por cada 300ml de agua</p>
+                </div>
+                <div class="paso">
+                  <span class="numero">2</span>
+                  <p><strong>Colador de tela:</strong> Usa un colador tradicional de tela o filtro permanente</p>
+                </div>
+                <div class="paso">
+                  <span class="numero">3</span>
+                  <p><strong>Agua caliente:</strong> Usa agua entre 88-92°C para resaltar la dulzura</p>
+                </div>
+                <div class="paso">
+                  <span class="numero">4</span>
+                  <p><strong>Proceso:</strong> Vierte el agua caliente sobre el café en el colador</p>
+                </div>
+                <div class="paso">
+                  <span class="numero">5</span>
+                  <p><strong>Filtrado:</strong> Deja que el café se filtre completamente (3-4 minutos)</p>
+                </div>
+                <div class="paso">
+                  <span class="numero">6</span>
+                  <p><strong>Endulzar:</strong> Opcional - añade panela o azúcar al gusto</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="consejos-extra">
+            <h3>💡 Consejos de los Expertos</h3>
+            <div class="consejos-grid">
+              <div class="consejo">
+                <span class="icono">🌡️</span>
+                <h4>Temperatura Perfecta</h4>
+                <p>Nunca uses agua hirviendo. La temperatura ideal resalta las notas dulces y frutales de nuestros cafés especiales.</p>
+              </div>
+              <div class="consejo">
+                <span class="icono">🏺</span>
+                <h4>Almacenamiento</h4>
+                <p>Guarda el café molido en un recipiente hermético, en lugar fresco y seco, lejos de la luz directa.</p>
+              </div>
+              <div class="consejo">
+                <span class="icono">💧</span>
+                <h4>Calidad del Agua</h4>
+                <p>Usa agua filtrada. El 98% de tu taza es agua, así que su calidad es fundamental.</p>
+              </div>
+              <div class="consejo">
+                <span class="icono">🥄</span>
+                <h4>Medida Perfecta</h4>
+                <p>Una cucharada sopera equivale aproximadamente a 7-8g de café molido. Ajusta según tu gusto.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="cafe-valdore-tips">
+            <h3>🏔️ Para Nuestros Cafés del Huila</h3>
+            <div class="tips-especiales">
+              <div class="tip-bourbon">
+                <h4>Bourbon Rosado</h4>
+                <p>Para resaltar sus notas florales y de frutos rojos, usa agua a 92°C y prepáralo con el método de filtro. Su perfil delicado y aromático se disfruta mejor sin azúcar para apreciar su dulzura natural.</p>
+              </div>
+              <div class="tip-caturra">
+                <h4>Caturra</h4>
+                <p>Su perfil equilibrado y cremoso se destaca con cualquier método. Para resaltar sus notas de cacao y frutos secos, usa agua a 90°C. Ideal tanto solo como con un toque de panela.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mensaje para usuarios no autenticados -->
+    <div id="loginMessage" class="login-required" style="display: none;">
+      <div class="message-box">
+        <h3>🔐 Inicia sesión para comprar</h3>
+        <p>Para agregar productos al carrito y realizar pedidos, necesitas tener una cuenta.</p>
+        <button onclick="window.location.href='auth.html'" class="login-prompt-btn">
+          Iniciar Sesión / Registrarse
+        </button>
+      </div>
+    </div>
+
+    <!-- Mensaje para usuarios no autenticados en chat-->
+    <div id="loginChat" class="login-required" style="display: none;">
+      <div class="message-box">
+        <h3>🔐 Inicia sesión para chatear</h3>
+        <p>Para poder usar el chat de café valdore, necesitas tener una cuenta.</p>
+        <button onclick="window.location.href='auth.html'" class="login-prompt-btn">
+          Iniciar Sesión / Registrarse
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Overlay del carrito -->
+  <div class="carrito-overlay" id="carritoOverlay"></div>
+
+  <!-- Carrito lateral -->
+  <aside id="carrito" class="carrito-sidebar">
+    <button id="cerrarCarrito" class="cerrarBtn">X</button>
+    <h2>Tu Carrito 🛒</h2>
+    <ul id="listaCarrito"></ul>
+    <p id="totalCarrito">Total: $0</p>
+    <button id="guardarPedido" class="btn-confirmar">
+      ✅ Confirmar Pedido
+    </button>
+    <button id="vaciarCarrito" class="btn-vaciar">
+      🗑️ Vaciar Carrito
+    </button>
+  </aside>
+  
+  <!-- Footer -->
+  <footer class="footer-contacto">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>☕ Café Valdore</h3>
+        <p>Desde el Valle de Laboyos, cultivamos y procesamos café de la más alta calidad para los amantes del buen café.</p>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Enlaces Rápidos</h4>
+        <ul>
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="historia.html">Nuestra Historia</a></li>
+          <li><a href="pedidos.html">Mis Pedidos</a></li>
+          <li><a href="contacto.html">Contáctanos</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Redes Sociales</h4>
+        <div class="social-links">
+          <!-- BADGES DE REDES SOCIALES SIN LAZY LOADING (son pequeños y críticos) -->
+          <a href="https://www.facebook.com/profile.php?id=61580621437211" target="_blank">
+            <img src="https://img.shields.io/badge/Facebook-094293?style=for-the-badge&logo=facebook&logoColor=white" alt="Sígueme en Facebook">
+          </a>
+          <a href="https://www.instagram.com/cafevaldore/" target="_blank">
+            <img src="https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white" alt="Sígueme en Instagram">
+          </a>
+          <a href="mailto:cafevaldore@gmail.com" target="_blank">
+            <img src="https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email me">
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <p>&copy; 2025 Café Valdore.
+        <span class="admin-link" onclick="window.location.href='admin-login.html'">
+          Todos los derechos reservados
+        </span>
+      </p>
+    </div>
+  </footer>
+
+  <!-- Chat flotante para comunicación con administrador -->
+  <div class="chat-container" id="chatContainer">
+    <button class="chat-toggle" id="chatToggle">
+      💬
+      <span class="chat-badge" id="chatBadge" style="display: none;">0</span>
+    </button>
+    
+    <div class="chat-window" id="chatWindow">
+      <div class="chat-header">
+        <h3>💬 Chat con Café Valdore</h3>
+        <button class="chat-close" id="chatClose">&times;</button>
+      </div>
+      
+      <div class="chat-messages" id="chatMessages">
+        <!-- Los mensajes se cargarán aquí dinámicamente -->
+        <div class="chat-welcome">
+          <p>¡Hola! ¿En qué podemos ayudarte?</p>
+          <p>Estamos aquí para responder tus preguntas sobre nuestros productos, pedidos o cualquier consulta que tengas.</p>
+        </div>
+      </div>
+      
+      <div class="chat-input">
+        <textarea id="mensajeChat" placeholder="Escribe tu mensaje aquí..." rows="2"></textarea>
+        <button id="enviarMensajeChat">📤</button>
+      </div>
+    </div>
+  </div>
+
+
+<!-- ✅ Solo main.js - Firebase se carga automáticamente cuando se necesita -->
+<!-- AL FINAL DEL BODY -->
+<script type="module" src="main.js"></script>
+<script type="module" src="chat.js"></script>
+
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('✅ SW registrado'))
+      .catch(err => console.log('❌ SW error:', err));
+  });
+}
+</script>
+</body>
+</html>
+
+</body>
+</html>

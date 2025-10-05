@@ -1,0 +1,139 @@
+
+/* Productos mejorados */
+.productos {
+  padding: 3rem 0;
+}
+
+.productos h2 {
+  text-align: center;
+  color: #231a11;
+  font-size: 2.5rem;
+  margin-bottom: 3rem;
+  font-weight: 700;
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.productos h2::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 4px;
+  background: linear-gradient(90deg, #DAA520, #DAA520);
+  border-radius: 2px;
+}
+
+.productos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2.5rem;
+  justify-content: center;
+}
+
+.producto {
+  background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));
+  padding: 2.5rem;
+  border-radius: 25px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.producto::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #231a11, #DAA520, #231a11);
+  border-radius: 25px 25px 0 0;
+}
+
+.producto:hover {
+  transform: translateY(-15px) scale(1.02);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+  border-color: #DAA520;
+}
+
+.producto img {
+  max-width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 20px;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.producto:hover img {
+  transform: scale(1.05);
+  box-shadow: 0 12px 35px rgba(0,0,0,0.2);
+}
+
+.producto h3 {
+  color: #231a11;
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.producto p {
+  color: #666;
+  margin-bottom: 2rem;
+  line-height: 1.7;
+  font-size: 1rem;
+}
+
+.producto button {
+  background: linear-gradient(135deg, #231a11, #2e2113);
+  color: white;
+  border: none;
+  padding: 1.25rem 2.5rem;
+  border-radius: 30px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(35, 26, 17, 0.3);
+}
+
+.producto button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.producto button:hover::before {
+  left: 100%;
+}
+
+.producto button:hover {
+  background: linear-gradient(135deg, #2e2113, #3d2f1e);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(35, 26, 17, 0.4);
+}
+
+.producto button:disabled {
+  background: linear-gradient(135deg, #ccc, #bbb);
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
