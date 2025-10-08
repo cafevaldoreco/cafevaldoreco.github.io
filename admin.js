@@ -1,4 +1,4 @@
-// admin.js - OPTIMIZADO con carga diferida
+// admin.js - OPTIMIZADO con carga diferida y filtro de fecha corregido
 
 // Variables para módulos de Firebase
 let firebaseModules = {
@@ -101,8 +101,19 @@ function setupEventListeners() {
     });
   });
 
-  if (filtroEstado) filtroEstado.addEventListener('change', filtrarPedidos);
-  if (filtroFecha) filtroFecha.addEventListener('change', filtrarPedidos);
+  if (filtroEstado) {
+    filtroEstado.addEventListener('change', () => {
+      console.log('📊 Filtro estado cambiado:', filtroEstado.value);
+      filtrarPedidos();
+    });
+  }
+  
+  if (filtroFecha) {
+    filtroFecha.addEventListener('change', () => {
+      console.log('📅 Filtro fecha cambiado:', filtroFecha.value);
+      filtrarPedidos();
+    });
+  }
   
   if (btnActualizar) {
     btnActualizar.addEventListener('click', async () => {
@@ -172,6 +183,23 @@ async function cargarPedidos() {
         ...documento.data()
       });
     });
+    
+    // Debug: Mostrar fechas de los primeros 3 pedidos
+    console.log('📦 Pedidos cargados:', pedidosData.length);
+    if (pedidosData.length > 0) {
+      console.log('🔍 Muestra de fechas de los primeros pedidos:');
+      pedidosData.slice(0, 3).forEach((p, i) => {
+        console.log(`Pedido ${i+1}:`, {
+          id: p.id,
+          cliente: p.datosCliente?.nombre,
+          fechaRaw: p.fecha,
+          tipoFecha: typeof p.fecha
+        });
+      });
+    }
+    
+    // Exponer globalmente para debugging
+    window.pedidosData = pedidosData;
     
     if (currentTab === 'pedidos') {
       mostrarTabPedidos();
@@ -253,35 +281,168 @@ function filtrarPedidos() {
   mostrarTabPedidos();
 }
 
+// FUNCIÓN CORREGIDA: Filtrar pedidos con debug
 function filtrarPedidosData() {
   let pedidosFiltrados = [...pedidosData];
   
+  console.log('🔍 === INICIO DE FILTRADO ===');
+  console.log('Total de pedidos:', pedidosData.length);
+  
+  // ===== FILTRO POR ESTADO =====
   const estadoFiltro = filtroEstado?.value;
+  console.log('Estado filtro:', estadoFiltro);
+  
   if (estadoFiltro && estadoFiltro !== 'todos') {
     pedidosFiltrados = pedidosFiltrados.filter(pedido => 
       (pedido.estado || 'pendiente') === estadoFiltro
     );
+    console.log('Pedidos después de filtro de estado:', pedidosFiltrados.length);
   }
   
+  // ===== FILTRO POR FECHA - CORREGIDO =====
   const fechaFiltro = filtroFecha?.value;
+  console.log('Fecha filtro:', fechaFiltro);
+  
   if (fechaFiltro) {
-    const fechaSeleccionada = new Date(fechaFiltro);
+    console.log('📅 Aplicando filtro de fecha...');
+    
     pedidosFiltrados = pedidosFiltrados.filter(pedido => {
-      if (!pedido.fecha) return false;
-      
-      let fechaPedido;
-      if (pedido.fecha.toDate) {
-        fechaPedido = pedido.fecha.toDate();
-      } else {
-        fechaPedido = new Date(pedido.fecha);
+      if (!pedido.fecha) {
+        console.log('⚠️ Pedido sin fecha:', pedido.id);
+        return false;
       }
       
-      return fechaPedido.toDateString() === fechaSeleccionada.toDateString();
+      try {
+        // Convertir la fecha del pedido
+        let fechaPedido;
+        
+        if (pedido.fecha.toDate) {
+          // Timestamp de Firebase
+          fechaPedido = pedido.fecha.toDate();
+        } else if (pedido.fecha.seconds) {
+          // Timestamp serializado de Firebase
+          fechaPedido = new Date(pedido.fecha.seconds * 1000);
+        } else if (pedido.fecha instanceof Date) {
+          // Ya es Date
+          fechaPedido = pedido.fecha;
+        } else if (typeof pedido.fecha === 'string') {
+          // String
+          fechaPedido = new Date(pedido.fecha);
+        } else if (typeof pedido.fecha === 'number') {
+          // Timestamp numérico
+          fechaPedido = new Date(pedido.fecha);
+        } else {
+          console.log('⚠️ Formato de fecha desconocido:', pedido.fecha);
+          return false;
+        }
+        
+        // Convertir a formato YYYY-MM-DD (en hora local)
+        const year = fechaPedido.getFullYear();
+        const month = String(fechaPedido.getMonth() + 1).padStart(2, '0');
+        const day = String(fechaPedido.getDate()).padStart(2, '0');
+        const fechaPedidoStr = `${year}-${month}-${day}`;
+        
+        const coincide = fechaPedidoStr === fechaFiltro;
+        
+        if (coincide) {
+          console.log('✅ PEDIDO COINCIDE:', {
+            pedidoId: pedido.id,
+            cliente: pedido.datosCliente?.nombre,
+            fechaPedido: fechaPedidoStr,
+            fechaFiltro: fechaFiltro
+          });
+        }
+        
+        return coincide;
+        
+      } catch (error) {
+        console.error('❌ Error procesando fecha:', error);
+        console.error('Pedido problemático:', pedido);
+        return false;
+      }
     });
+    
+    console.log(`📊 Total después de filtro de fecha: ${pedidosFiltrados.length}`);
   }
+  
+  console.log('🔍 === FIN DE FILTRADO ===');
+  console.log('Pedidos finales:', pedidosFiltrados.length);
   
   return pedidosFiltrados;
 }
+
+// FUNCIÓN DE DEBUG: Ver todas las fechas de pedidos
+window.debugFechas = function() {
+  console.clear();
+  console.log('🔍 === DEBUG DE FECHAS ===');
+  console.log('Total de pedidos:', pedidosData.length);
+  
+  if (pedidosData.length === 0) {
+    console.log('⚠️ No hay pedidos cargados');
+    mostrarNotificacion('No hay pedidos cargados', 'info');
+    return;
+  }
+  
+  pedidosData.forEach((pedido, index) => {
+    console.log(`\n--- Pedido ${index + 1} ---`);
+    console.log('ID:', pedido.id);
+    console.log('Cliente:', pedido.datosCliente?.nombre || 'Sin nombre');
+    console.log('Fecha raw:', pedido.fecha);
+    console.log('Tipo:', typeof pedido.fecha);
+    
+    if (pedido.fecha) {
+      try {
+        let fechaPedido;
+        
+        if (pedido.fecha.toDate) {
+          fechaPedido = pedido.fecha.toDate();
+          console.log('✅ Es Timestamp de Firebase');
+        } else if (pedido.fecha.seconds) {
+          fechaPedido = new Date(pedido.fecha.seconds * 1000);
+          console.log('✅ Es Timestamp serializado');
+        } else if (pedido.fecha instanceof Date) {
+          fechaPedido = pedido.fecha;
+          console.log('✅ Ya es Date');
+        } else {
+          fechaPedido = new Date(pedido.fecha);
+          console.log('✅ Convertido a Date desde:', typeof pedido.fecha);
+        }
+        
+        const year = fechaPedido.getFullYear();
+        const month = String(fechaPedido.getMonth() + 1).padStart(2, '0');
+        const day = String(fechaPedido.getDate()).padStart(2, '0');
+        const fechaFormateada = `${year}-${month}-${day}`;
+        
+        console.log('📅 Fecha formateada:', fechaFormateada);
+        console.log('🕐 Fecha completa:', fechaPedido.toLocaleString('es-CO'));
+        
+      } catch (error) {
+        console.error('❌ Error:', error);
+      }
+    } else {
+      console.log('❌ SIN FECHA');
+    }
+  });
+  
+  console.log('\n🔍 === FIN DEBUG ===');
+  mostrarNotificacion('Revisa la consola (F12)', 'info');
+};
+
+// FUNCIÓN PARA LIMPIAR FILTROS
+window.limpiarFiltros = function() {
+  console.log('🗑️ Limpiando filtros...');
+  
+  if (filtroEstado) {
+    filtroEstado.value = 'todos';
+  }
+  
+  if (filtroFecha) {
+    filtroFecha.value = '';
+  }
+  
+  mostrarTabPedidos();
+  mostrarNotificacion('Filtros limpiados', 'info');
+};
 
 window.cambiarEstado = async function(pedidoId, nuevoEstado) {
   try {
@@ -397,6 +558,9 @@ async function cargarMensajes() {
         ...documento.data()
       });
     });
+    
+    // Exponer globalmente para debugging
+    window.mensajesData = mensajesData;
     
     if (currentTab === 'mensajes') {
       mostrarTabMensajes();
@@ -637,4 +801,11 @@ styleSheet.textContent = `
 
 document.head.appendChild(styleSheet);
 
-console.log('✅ admin.js cargado - Modo optimizado');
+// Exponer variables y funciones globalmente para debugging
+window.pedidosData = pedidosData;
+window.mensajesData = mensajesData;
+
+console.log('✅ admin.js cargado - Modo optimizado con filtro de fecha corregido');
+console.log('💡 Funciones de debug disponibles:');
+console.log('   - debugFechas() - Ver todas las fechas de pedidos');
+console.log('   - limpiarFiltros() - Limpiar todos los filtros');

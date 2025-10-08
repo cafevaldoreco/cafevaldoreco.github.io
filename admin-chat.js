@@ -1,18 +1,15 @@
-// admin-chat.js - OPTIMIZADO (Firebase ya cargado por admin.js)
+// admin-chat.js - OPTIMIZADO CON SOPORTE MÓVIL COMPLETO
 
-// Variables para módulos de Firebase (reutilizar del scope global)
 let firebaseModules = {
   db: null,
   loaded: false
 };
 
-// Función para obtener Firebase (ya debería estar cargado por admin.js)
 async function getFirebaseModules() {
   if (firebaseModules.loaded) {
     return firebaseModules;
   }
 
-  // Cargar si no está disponible
   console.log('📦 Admin-chat: Cargando Firebase...');
   
   const configModule = await import('./firebaseconfig.js');
@@ -34,13 +31,11 @@ async function getFirebaseModules() {
   return firebaseModules;
 }
 
-// Variables globales para el chat
 let conversacionesData = [];
 let conversacionActiva = null;
 let unsubscribeConversaciones = null;
 let unsubscribeMensajes = null;
 
-// Elementos del DOM
 const conversacionesLista = document.getElementById('conversacionesLista');
 const buscarConversacion = document.getElementById('buscarConversacion');
 const filtroConversacionesEstado = document.getElementById('filtroConversacionesEstado');
@@ -62,7 +57,6 @@ document.addEventListener('DOMContentLoaded', function() {
 async function inicializarChatAdmin() {
   console.log('Inicializando chat admin...');
   
-  // Asegurar que Firebase esté cargado
   await getFirebaseModules();
   
   if (buscarConversacion) {
@@ -244,6 +238,15 @@ window.seleccionarConversacion = async function(conversacionId) {
   
   conversacionActiva = conversacion;
   
+  // NUEVO: Mostrar área de chat en móviles
+  const chatArea = document.querySelector('.chat-area');
+  const conversacionesSidebar = document.querySelector('.conversaciones-sidebar');
+  
+  if (window.innerWidth <= 768) {
+    if (chatArea) chatArea.classList.add('activa');
+    if (conversacionesSidebar) conversacionesSidebar.classList.add('oculta');
+  }
+  
   if (clienteNombre) clienteNombre.textContent = conversacion.usuarioEmail;
   if (clienteEmail) clienteEmail.textContent = `ID: ${conversacion.usuarioId}`;
   if (chatStatus) {
@@ -255,6 +258,17 @@ window.seleccionarConversacion = async function(conversacionId) {
   cargarMensajesConversacion(conversacionId);
   mostrarConversaciones();
   marcarMensajesComoLeidos(conversacionId);
+};
+
+// NUEVA FUNCIÓN: Volver a lista de conversaciones (móvil)
+window.volverAConversaciones = function() {
+  const chatArea = document.querySelector('.chat-area');
+  const conversacionesSidebar = document.querySelector('.conversaciones-sidebar');
+  
+  if (chatArea) chatArea.classList.remove('activa');
+  if (conversacionesSidebar) conversacionesSidebar.classList.remove('oculta');
+  
+  conversacionActiva = null;
 };
 
 function cargarMensajesConversacion(conversacionId) {
@@ -483,4 +497,4 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-console.log('✅ admin-chat.js cargado - Modo optimizado');
+console.log('✅ admin-chat.js cargado - Modo optimizado con soporte móvil');
