@@ -124,7 +124,7 @@
         <!-- Panel de Pedidos -->
         <div id="tab-pedidos" class="tab-pane active">
           <!-- FILTROS SIMPLIFICADOS SIN BOTÓN -->
-          <div class="filtros-pedidos-simple">
+          <!-- <div class="filtros-pedidos-simple">
             <select id="filtroEstado">
               <option value="todos">Todos los estados</option>
               <option value="pendiente">Pendientes</option>
@@ -132,8 +132,32 @@
               <option value="completado">Completados</option>
             </select>
             <input type="date" id="filtroFecha" placeholder="Filtrar por fecha">
-          </div>
+          </div> -->
 
+          <!-- FILTROS SIMPLIFICADOS CON BOTÓN LIMPIAR -->
+          <div class="filtros-pedidos-simple">
+  <select id="filtroEstado">
+    <option value="todos">Todos los estados</option>
+    <option value="pendiente">Pendientes</option>
+    <option value="en-proceso">En proceso</option>
+    <option value="completado">Completados</option>
+  </select>
+  
+  <input type="date" id="filtroFecha" placeholder="Filtrar por fecha">
+  
+  <!-- NUEVO: Botón para limpiar -->
+  <button onclick="limpiarFiltros()" class="btn-limpiar-filtros" 
+          style="padding: 0.9rem 1.2rem; 
+                 background: linear-gradient(135deg, #64748b, #475569); 
+                 color: white; 
+                 border: none; 
+                 border-radius: 10px; 
+                 cursor: pointer; 
+                 font-weight: 600;
+                 transition: all 0.3s ease;">
+    🗑️ Limpiar
+  </button>
+</div>
           <div class="pedidos-list" id="listaPedidosAdmin">
             <div class="loading">Cargando pedidos...</div>
           </div>
@@ -170,7 +194,7 @@
             </div>
             
             <div class="chat-area">
-              <div class="chat-header" id="chatHeader">
+              <!-- <div class="chat-header" id="chatHeader">
                 <div class="cliente-info">
                   <h4 id="clienteNombre">Selecciona una conversación</h4>
                   <span id="clienteEmail"></span>
@@ -178,7 +202,19 @@
                 <div class="chat-status" id="chatStatus">
                   <span class="status-indicator"></span>
                 </div>
+              </div> -->
+              <div class="chat-header" id="chatHeader">
+  <!-- NUEVO: Botón volver para móviles -->
+            <button class="btn-volver-mobile" onclick="volverAConversaciones()">← </button>
+  
+            <div class="cliente-info">
+            <h4 id="clienteNombre">Selecciona una conversación</h4>
+            <span id="clienteEmail"></span>
+            </div>
+            <div class="chat-status" id="chatStatus">
+            <span class="status-indicator"></span>
               </div>
+            </div>
               
               <div class="chat-messages" id="chatMessages">
                 <div class="chat-welcome">

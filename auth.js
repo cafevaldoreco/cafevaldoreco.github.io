@@ -28,7 +28,11 @@ async function loadFirebaseForAuth() {
     firebaseModules.reauthenticateWithCredential = authModule.reauthenticateWithCredential;
     firebaseModules.EmailAuthProvider = authModule.EmailAuthProvider;
     firebaseModules.onAuthStateChanged = authModule.onAuthStateChanged;
-    
+
+    //implementación de inicio de sesión con Google
+    firebaseModules.GoogleAuthProvider = authModule.GoogleAuthProvider;
+    firebaseModules.signInWithPopup = authModule.signInWithPopup;
+
     firebaseModules.loaded = true;
     console.log('✅ Auth: Firebase cargado');
     
@@ -38,6 +42,44 @@ async function loadFirebaseForAuth() {
     throw error;
   }
 }
+
+// NUEVA FUNCIÓN: Login con Google
+async function handleGoogleSignIn() {
+  try {
+    await loadFirebaseForAuth();
+    
+    const provider = new firebaseModules.GoogleAuthProvider();
+    provider.setCustomParameters({
+      prompt: 'select_account'
+    });
+    
+    const result = await firebaseModules.signInWithPopup(firebaseModules.auth, provider);
+    
+    console.log('✅ Login con Google exitoso:', result.user.uid);
+    showSuccess('¡Bienvenido, ' + result.user.displayName + '!');
+    
+    setTimeout(() => {
+      console.log('🔄 Redirigiendo a index.html...');
+      window.location.href = 'index.html';
+    }, 1500);
+  } catch (error) {
+    console.error('Error en login con Google:', error);
+    
+    if (error.code === 'auth/popup-closed-by-user') {
+      showError('Inicio de sesión cancelado');
+    } else if (error.code === 'auth/popup-blocked') {
+      showError('Popup bloqueado. Por favor permite popups para este sitio');
+    } else if (error.code === 'auth/account-exists-with-different-credential') {
+      showError('Ya existe una cuenta con este correo usando otro método');
+    } else {
+      showError('Error al iniciar sesión con Google');
+    }
+  }
+}
+
+// EVENTOS: Agregar listeners para los botones de Google
+document.getElementById('googleLoginBtn').addEventListener('click', handleGoogleSignIn);
+document.getElementById('googleRegisterBtn').addEventListener('click', handleGoogleSignIn);
 
 function showError(message) {
   errorMsg.textContent = message;

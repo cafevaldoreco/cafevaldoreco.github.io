@@ -1831,3 +1831,58 @@
 .chat-messages::-webkit-scrollbar-thumb:hover {
   background: #B8860B;
 }
+
+/* ESTILOS ADICIONALES PARA MÓVIL - CRÍTICOS */
+.mensajes-sin-leer {
+  background: linear-gradient(135deg, #EF4444, #DC2626);
+  color: white;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-left: 0.5rem;
+}
+
+.conversacion-item.sin-leer {
+  border-left: 4px solid #EF4444;
+  background: rgba(239, 68, 68, 0.05);
+}
+
+/* RESPONSIVE PARA CHAT - SOLUCIÓN COMPLETA */
+@media (max-width: 768px) {
+  .chat-admin-container {
+    position: relative;
+    height: calc(100vh - 200px) !important;
+  }
+  
+  .conversaciones-sidebar {
+    position: absolute;
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    z-index: 2;
+    transition: transform 0.3s ease;
+  }
+  
+  .conversaciones-sidebar.oculta {
+    transform: translateX(-100%);
+  }
+  
+  .chat-area {
+    position: absolute;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 1;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .chat-area.activa {
+    transform: translateX(0) !important;
+    z-index: 3;
+  }
+  
+  .btn-volver-mobile {
+    display: flex !important;
+  }
+}
