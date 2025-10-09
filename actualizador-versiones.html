@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- IMPORTANTE: Evitar caché de esta herramienta -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  
+  <title>Actualizador de Versiones - Café Valdore</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #231a11 0%, #2e2113 50%, #3d2f1e 100%);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      padding: 3rem;
+      border-radius: 20px;
+      max-width: 800px;
+      width: 100%;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+      border: 2px solid rgba(218, 165, 32, 0.2);
+    }
+    
+    h1 {
+      color: #DAA520;
+      margin-bottom: 2rem;
+      text-align: center;
+      font-size: 2rem;
+    }
+    
+    .version-input {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .input-group {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1rem;
+      border-radius: 10px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #DAA520;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    
+    input[type="number"] {
+      width: 100%;
+      padding: 0.8rem;
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid rgba(218, 165, 32, 0.3);
+      border-radius: 8px;
+      font-size: 1.5rem;
+      color: #333;
+      font-weight: 700;
+      text-align: center;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: #DAA520;
+      box-shadow: 0 0 0 3px rgba(218, 165, 32, 0.2);
+    }
+    
+    .version-display {
+      background: linear-gradient(135deg, rgba(218, 165, 32, 0.2), rgba(218, 165, 32, 0.1));
+      padding: 1.5rem;
+      border-radius: 15px;
+      margin: 1.5rem 0;
+      text-align: center;
+      border: 2px solid rgba(218, 165, 32, 0.3);
+    }
+    
+    .version-display h2 {
+      color: #DAA520;
+      font-size: 2.5rem;
+      margin: 0;
+    }
+    
+    .quick-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .quick-btn {
+      padding: 1rem;
+      background: rgba(218, 165, 32, 0.15);
+      border: 2px solid rgba(218, 165, 32, 0.3);
+      border-radius: 12px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+    
+    .quick-btn:hover {
+      background: rgba(218, 165, 32, 0.25);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(218, 165, 32, 0.3);
+    }
+    
+    .quick-btn span {
+      display: block;
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .quick-btn small {
+      display: block;
+      opacity: 0.8;
+      font-size: 0.85rem;
+    }
+    
+    .generate-btn {
+      width: 100%;
+      padding: 1.5rem;
+      background: linear-gradient(135deg, #DAA520, #ffed4e);
+      color: #231a11;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 1rem;
+    }
+    
+    .generate-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(218, 165, 32, 0.4);
+    }
+    
+    .output {
+      display: none;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 12px;
+      padding: 1.5rem;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    
+    .output.show {
+      display: block;
+      animation: slideDown 0.3s ease;
+    }
+    
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .code-block {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      border-left: 4px solid #DAA520;
+    }
+    
+    .code-block h3 {
+      color: #DAA520;
+      margin-bottom: 0.8rem;
+      font-size: 1.1rem;
+    }
+    
+    .code-line {
+      color: #10B981;
+      margin: 0.3rem 0;
+      line-height: 1.6;
+      word-break: break-all;
+    }
+    
+    .highlight {
+      color: #F59E0B;
+      font-weight: 700;
+    }
+    
+    .success {
+      color: #10B981;
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .copy-btn {
+      background: rgba(59, 130, 246, 0.2);
+      border: 2px solid rgba(59, 130, 246, 0.4);
+      color: #93C5FD;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-top: 0.5rem;
+      transition: all 0.2s ease;
+    }
+    
+    .copy-btn:hover {
+      background: rgba(59, 130, 246, 0.3);
+      transform: scale(1.05);
+    }
+    
+    .instructions {
+      background: rgba(59, 130, 246, 0.1);
+      padding: 1rem;
+      border-radius: 10px;
+      margin-bottom: 2rem;
+      border-left: 4px solid #3B82F6;
+    }
+    
+    .instructions p {
+      margin: 0.5rem 0;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: rgba(218, 165, 32, 0.5);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(218, 165, 32, 0.7);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔄 Actualizador Automático de Versiones</h1>
+    
+    <div class="instructions">
+      <p><strong>📋 Cómo usar:</strong></p>
+      <p>1. Ingresa la versión actual o usa los botones de incremento rápido</p>
+      <p>2. Haz clic en "Generar Código"</p>
+      <p>3. Copia y pega el código en tus archivos</p>
+    </div>
+    
+    <div class="version-input">
+      <div class="input-group">
+        <label>Mayor</label>
+        <input type="number" id="major" value="1" min="0">
+      </div>
+      <div class="input-group">
+        <label>Minor</label>
+        <input type="number" id="minor" value="1" min="0">
+      </div>
+      <div class="input-group">
+        <label>Patch</label>
+        <input type="number" id="patch" value="0" min="0">
+      </div>
+    </div>
+    
+    <div class="version-display">
+      <h2 id="versionDisplay">v1.1.0</h2>
+    </div>
+    
+    <div class="quick-buttons">
+      <button class="quick-btn" id="btnPatch">
+        <span>🐛</span>
+        <strong>Bug Fix</strong>
+        <small>+0.0.1</small>
+      </button>
+      <button class="quick-btn" id="btnMinor">
+        <span>✨</span>
+        <strong>Feature</strong>
+        <small>+0.1.0</small>
+      </button>
+      <button class="quick-btn" id="btnMajor">
+        <span>🚀</span>
+        <strong>Major</strong>
+        <small>+1.0.0</small>
+      </button>
+    </div>
+    
+    <button class="generate-btn" id="btnGenerar">
+      📝 Generar Código de Actualización
+    </button>
+    
+    <div id="output" class="output"></div>
+  </div>
+
+  <script>
+    // Variables globales
+    let codigoSW = '';
+    let codigoVersion = '';
+
+    // Actualizar display en tiempo real
+    function updateDisplay() {
+      const major = document.getElementById('major').value;
+      const minor = document.getElementById('minor').value;
+      const patch = document.getElementById('patch').value;
+      document.getElementById('versionDisplay').textContent = `v${major}.${minor}.${patch}`;
+    }
+
+    // Event listeners para inputs
+    document.getElementById('major').addEventListener('input', updateDisplay);
+    document.getElementById('minor').addEventListener('input', updateDisplay);
+    document.getElementById('patch').addEventListener('input', updateDisplay);
+
+    // Event listeners para botones
+    document.getElementById('btnPatch').addEventListener('click', function() {
+      const patch = document.getElementById('patch');
+      patch.value = parseInt(patch.value) + 1;
+      updateDisplay();
+    });
+
+    document.getElementById('btnMinor').addEventListener('click', function() {
+      const minor = document.getElementById('minor');
+      const patch = document.getElementById('patch');
+      minor.value = parseInt(minor.value) + 1;
+      patch.value = 0;
+      updateDisplay();
+    });
+
+    document.getElementById('btnMajor').addEventListener('click', function() {
+      const major = document.getElementById('major');
+      const minor = document.getElementById('minor');
+      const patch = document.getElementById('patch');
+      major.value = parseInt(major.value) + 1;
+      minor.value = 0;
+      patch.value = 0;
+      updateDisplay();
+    });
+
+    document.getElementById('btnGenerar').addEventListener('click', function() {
+      const major = document.getElementById('major').value;
+      const minor = document.getElementById('minor').value;
+      const patch = document.getElementById('patch').value;
+      const version = `${major}.${minor}.${patch}`;
+      const versionV = `v${version}`;
+      const today = new Date().toISOString().split('T')[0];
+      
+      const output = document.getElementById('output');
+      
+      // Guardar códigos en variables globales
+      codigoSW = `const CACHE_VERSION = '${versionV}';`;
+      const linea1 = `const APP_VERSION = '${version}';`;
+      const linea2 = `const BUILD_DATE = '${today}';`;
+      codigoVersion = `${linea1}\n${linea2}`;
+      
+      let html = `
+        <div class="success">✅ Código generado para versión ${versionV}</div>
+        
+        <div class="code-block">
+          <h3>📄 sw.js (línea 2):</h3>
+          <div class="code-line">${codigoSW}</div>
+          <button class="copy-btn" id="copySW">📋 Copiar</button>
+        </div>
+        
+        <div class="code-block">
+          <h3>📄 version.js (líneas 2-3):</h3>
+          <div class="code-line">${linea1}</div>
+          <div class="code-line">${linea2}</div>
+          <button class="copy-btn" id="copyVersion">📋 Copiar ambas</button>
+        </div>
+        
+        <div class="code-block">
+          <h3>🔄 Pasos siguientes:</h3>
+          <p style="color: #93C5FD; margin: 0.5rem 0;">
+            1. Copia y pega el código en sw.js<br>
+            2. Copia y pega el código en version.js<br>
+            3. Recarga con <span class="highlight">Ctrl + Shift + R</span><br>
+            4. ¡Listo! ✅
+          </p>
+        </div>
+      `;
+      
+      output.innerHTML = html;
+      output.classList.add('show');
+      
+      // Agregar event listeners a los botones de copiar
+      document.getElementById('copySW').addEventListener('click', function() {
+        copiarAlPortapapeles(codigoSW, this);
+      });
+      
+      document.getElementById('copyVersion').addEventListener('click', function() {
+        copiarAlPortapapeles(codigoVersion, this);
+      });
+      
+      output.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+
+    function copiarAlPortapapeles(texto, boton) {
+      navigator.clipboard.writeText(texto).then(function() {
+        // Cambiar estado del botón
+        const textoOriginal = boton.textContent;
+        boton.textContent = '✅ Copiado!';
+        boton.style.background = 'rgba(16, 185, 129, 0.3)';
+        boton.style.borderColor = 'rgba(16, 185, 129, 0.5)';
+        boton.style.color = '#86efac';
+        
+        setTimeout(function() {
+          boton.textContent = textoOriginal;
+          boton.style.background = 'rgba(59, 130, 246, 0.2)';
+          boton.style.borderColor = 'rgba(59, 130, 246, 0.4)';
+          boton.style.color = '#93C5FD';
+        }, 2000);
+      }).catch(function(err) {
+        alert('Error al copiar:\n\n' + texto + '\n\nCopia manualmente este código.');
+      });
+    }
+
+    // Inicializar
+    updateDisplay();
+  </script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 // sw.js - Service Worker CORREGIDO
-const CACHE_VERSION = 'v1.3';
+const CACHE_VERSION = 'v1.2.0'; // ← Debe coincidir con version.js
 const CACHE_NAME = `cafe-valdore-${CACHE_VERSION}`;
 
 // Recursos para cachear - ACTUALIZADO con tus archivos reales
@@ -25,6 +25,7 @@ const ASSETS_TO_CACHE = [
   '/main.js',
   '/firebaseconfig.js',
   '/chat.js',
+  '/version.js',
   '/cargarPedidos.js',
 
   // Imágenes WebP
