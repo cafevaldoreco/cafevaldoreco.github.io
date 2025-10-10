@@ -113,30 +113,30 @@
     </section>
 
     <!-- Productos -->
-    <section class="productos">
+    <!-- <section class="productos">
       <h2>Nuestros Cafés Especiales</h2>
       <div class="productos-grid">
-        <div class="producto">
+        <div class="producto"> -->
           <!-- IMAGEN CON LAZY LOADING -->
-          <img src="bourbon.webp" alt="Bourbon Rosado" loading="lazy" width="250" height="250">
+          <!-- <img src="bourbon.webp" alt="Bourbon Rosado" loading="lazy" width="250" height="250">
           <h3>Bourbon Rosado 500g</h3>
           <p>Café de tueste medio, con cuerpo ligero y sedoso. Presenta un perfil frutal y floral, con notas de cereza, fresa y miel, que se combinan con una dulzura natural que envuelve el paladar. Ideal para quienes disfrutan de un café delicado, aromático y equilibrado, que despierta los sentidos sin ser agresivo.</p>
           <button class="add-to-cart-btn" data-producto="Bourbon Rosado" data-precio="50000">
             Agregar al Carrito • $50.000
           </button>
         </div>
-        <div class="producto">
+        <div class="producto"> -->
           <!-- IMAGEN CON LAZY LOADING -->
-          <img src="caturra.webp" alt="Caturra" loading="lazy" width="250" height="250">
+          <!-- <img src="caturra.webp" alt="Caturra" loading="lazy" width="250" height="250">
           <h3>Caturra 500g</h3>
           <p>Café de tueste medio, con cuerpo medio y textura cremosa. Destaca por su equilibrio entre acidez brillante y notas dulces, acompañadas de un aroma intenso a frutos secos y cacao. Una experiencia envolvente y compleja, ideal para quienes buscan un café aromático, con carácter y un sabor persistente.</p>
           <button class="add-to-cart-btn" data-producto="Caturra" data-precio="50000">
             Agregar al Carrito • $50.000
           </button>
         </div>
-        <div class="producto">
+        <div class="producto"> -->
           <!-- IMAGEN CON LAZY LOADING -->
-          <img src="promocion.webp" alt="Promoción Bourbon + Caturra" loading="lazy" width="250" height="250">
+          <!-- <img src="promocion.webp" alt="Promoción Bourbon + Caturra" loading="lazy" width="250" height="250">
           <h3>Gran Promoción Bourbon + Caturra 1000g</h3>
           <p>🔥 Descubre el balance perfecto con nuestra combinación exclusiva de Bourbon y Caturra, dos cafés de origen único que conquistan por su cuerpo medio, notas dulces y final cremoso.
 Un café premium, aromático y sofisticado para quienes disfrutan la excelencia en cada sorbo.
@@ -148,9 +148,9 @@ Un café premium, aromático y sofisticado para quienes disfrutan la excelencia 
             Agregar al Carrito • $80.000
           </button>
         </div>
-        <div class="producto">
+        <div class="producto"> -->
           <!-- IMAGEN CON LAZY LOADING -->
-          <img src="superpromocion.webp" alt="Super Promoción Bourbon + Caturra X2" loading="lazy" width="250" height="250">
+          <!-- <img src="superpromocion.webp" alt="Super Promoción Bourbon + Caturra X2" loading="lazy" width="250" height="250">
           <h3>Super Promoción 2 bolsas de Bourbon + 2 bolsas de Caturra 2000g</h3>
           <p>🔥 Lleva el doble y ahorra más con esta super promoción familiar: 2 bolsas de Bourbon y 2 bolsas de Caturra, 2000g de café selecto para que nunca falte en casa. Vive una experiencia intensa y envolvente, con aromas de frutos secos, cacao y notas brillantes que harán de cada preparación un momento especial.
 👉 Más café, más sabor, más ahorro.</p>
@@ -162,7 +162,23 @@ Un café premium, aromático y sofisticado para quienes disfrutan la excelencia 
           </button>
         </div>
       </div>
-    </section>
+    </section> -->
+
+<!-- Productos -->
+<section class="productos">
+  <div class="container">
+    <h2>Nuestros Cafés Especiales</h2>
+    
+    <!-- Contenedor donde se cargarán los productos dinámicamente -->
+    <div class="productos-grid" id="productosContainer">
+      <!-- Loading inicial -->
+      <div class="loading-productos">
+        <div class="loading-spinner"></div>
+        <p>Cargando productos...</p>
+      </div>
+    </div>
+  </div>
+</section>
 
     <!-- Sección de preparación de café -->
     <section class="preparacion-cafe">

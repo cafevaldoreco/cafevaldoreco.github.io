@@ -90,12 +90,21 @@ console.error = (...args) => {
 };
 
 // ==================== DETECCIÓN DE PÁGINA ====================
+// const paginaActual = {
+//   tieneCarrito: !!document.getElementById('listaCarrito'),
+//   tieneFormularioContacto: !!document.getElementById('formularioContacto'),
+//   tienePedidos: !!document.getElementById('pedidosContainer'),
+//   tieneFAQ: document.querySelectorAll('.faq-item').length > 0,
+//   tieneProductos: document.querySelectorAll('.add-to-cart-btn').length > 0
+// };
+
+//=========== NUEVA DETECCIÓN DE PÁGINA ==================
 const paginaActual = {
   tieneCarrito: !!document.getElementById('listaCarrito'),
   tieneFormularioContacto: !!document.getElementById('formularioContacto'),
   tienePedidos: !!document.getElementById('pedidosContainer'),
   tieneFAQ: document.querySelectorAll('.faq-item').length > 0,
-  tieneProductos: document.querySelectorAll('.add-to-cart-btn').length > 0
+  tieneProductos: !!document.getElementById('productosContainer') // ✅ DETECTAR EL CONTENEDOR
 };
 
 console.log('📄 Página detectada:', paginaActual);
