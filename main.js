@@ -101,21 +101,171 @@ const paginaActual = {
 console.log('📄 Página detectada:', paginaActual);
 
 // ===== FUNCIONES DEL CARRITO =====
+// window.agregarAlCarrito = async function(producto, precio) {
+//   if (!usuarioAutenticado) {
+//     mostrarLoginMessage();
+//     return;
+//   }
+
+//   const existente = carrito.find(item => item.producto === producto);
+//   if (existente) {
+//     existente.cantidad++;
+//   } else {
+//     carrito.push({ producto, precio, cantidad: 1 });
+//   }
+//   guardarCarrito();
+//   actualizarCarrito();
+//   mostrarNotificacion(`${producto} agregado al carrito`);
+// };
+
+//NUEVA FUNCIÓN AGREGAR AL CARRITO
+
+// 1️⃣ AGREGAR función para obtener stock actual de Firebase
+async function obtenerStockActual(productoId) {
+  try {
+    if (!firebaseModules.loaded) {
+      await loadFirebase();
+    }
+    
+    const { doc, getDoc } = 
+      await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    
+    const inventarioRef = doc(firebaseModules.db, 'inventario', productoId);
+    const inventarioSnap = await getDoc(inventarioRef);
+    
+    if (inventarioSnap.exists()) {
+      const data = inventarioSnap.data();
+      return {
+        stock: data.stock || 0,
+        activo: data.activo !== false
+      };
+    }
+    
+    return { stock: 0, activo: false };
+  } catch (error) {
+    console.error('Error obteniendo stock:', error);
+    return { stock: 0, activo: false };
+  }
+}
+
+// 2️⃣ AGREGAR función para identificar el ID del producto
+function identificarProductoId(nombreProducto) {
+  const nombre = nombreProducto.toLowerCase();
+  
+  // Detectar promociones
+  if (nombre.includes('promoción') || nombre.includes('promocion')) {
+    if (nombre.includes('súper') || nombre.includes('super')) {
+      return 'super-promocion';
+    }
+    return 'promocion-bourbon-caturra';
+  }
+  
+  // Productos individuales
+  if (nombre.includes('bourbon')) {
+    return 'cafe-bourbon';
+  } else if (nombre.includes('caturra')) {
+    return 'cafe-caturra';
+  }
+  
+  return null;
+}
+
+// 3️⃣ REEMPLAZAR la función agregarAlCarrito completa
+
 window.agregarAlCarrito = async function(producto, precio) {
+  // Verificar autenticación
   if (!usuarioAutenticado) {
     mostrarLoginMessage();
     return;
   }
-
-  const existente = carrito.find(item => item.producto === producto);
-  if (existente) {
-    existente.cantidad++;
-  } else {
-    carrito.push({ producto, precio, cantidad: 1 });
+  
+  // Mostrar indicador de carga
+  const btnOriginal = event?.target;
+  const textoOriginal = btnOriginal?.textContent;
+  if (btnOriginal) {
+    btnOriginal.disabled = true;
+    btnOriginal.textContent = '⏳ Verificando...';
   }
-  guardarCarrito();
-  actualizarCarrito();
-  mostrarNotificacion(`${producto} agregado al carrito`);
+  
+  try {
+    // Identificar el producto
+    const productoId = identificarProductoId(producto);
+    
+    if (!productoId) {
+      mostrarNotificacion(`⚠️ No se pudo identificar el producto: ${producto}`);
+      return;
+    }
+    
+    // Obtener stock actual de Firebase
+    console.log(`🔍 Verificando stock de ${productoId}...`);
+    const stockInfo = await obtenerStockActual(productoId);
+    
+    console.log(`   Stock disponible: ${stockInfo.stock}`);
+    console.log(`   Producto activo: ${stockInfo.activo}`);
+    
+    // Verificar si el producto está activo
+    if (!stockInfo.activo) {
+      mostrarNotificacion(`❌ ${producto} no está disponible actualmente`);
+      return;
+    }
+    
+    // Verificar si hay stock disponible
+    if (stockInfo.stock <= 0) {
+      mostrarNotificacion(`❌ ${producto} está agotado`);
+      return;
+    }
+    
+    // Calcular cuánto ya tiene en el carrito
+    const existente = carrito.find(item => item.producto === producto);
+    const cantidadEnCarrito = existente ? existente.cantidad : 0;
+    
+    // Verificar si puede agregar más
+    if (cantidadEnCarrito >= stockInfo.stock) {
+      mostrarNotificacion(
+        `❌ No hay más stock disponible de ${producto}. ` +
+        `Ya tienes ${cantidadEnCarrito} en el carrito (máximo: ${stockInfo.stock})`
+      );
+      return;
+    }
+    
+    // Agregar al carrito
+    if (existente) {
+      existente.cantidad++;
+      console.log(`   Incrementado a ${existente.cantidad} unidades`);
+    } else {
+      carrito.push({ 
+        producto, 
+        precio, 
+        cantidad: 1,
+        productoId: productoId,
+        stockDisponible: stockInfo.stock
+      });
+      console.log(`   Agregado al carrito (stock disponible: ${stockInfo.stock})`);
+    }
+    
+    guardarCarrito();
+    actualizarCarrito();
+    
+    const unidadesRestantes = stockInfo.stock - (cantidadEnCarrito + 1);
+    if (unidadesRestantes <= 3 && unidadesRestantes > 0) {
+      mostrarNotificacion(
+        `✅ ${producto} agregado al carrito. ` +
+        `⚠️ ¡Quedan solo ${unidadesRestantes} unidades!`
+      );
+    } else {
+      mostrarNotificacion(`✅ ${producto} agregado al carrito`);
+    }
+    
+  } catch (error) {
+    console.error('Error al agregar al carrito:', error);
+    mostrarNotificacion('❌ Error al agregar el producto. Intenta de nuevo.');
+  } finally {
+    // Restaurar botón
+    if (btnOriginal) {
+      btnOriginal.disabled = false;
+      btnOriginal.textContent = textoOriginal || '🛒 Agregar';
+    }
+  }
 };
 
 window.eliminarDelCarrito = function(index) {
@@ -336,33 +486,228 @@ window.mostrarFormularioPedido = function() {
 
   formulario.querySelector('#cancelarPedido').addEventListener('click', () => overlay.remove());
 
-  formulario.querySelector('#formPedido').addEventListener('submit', async (e) => {
-    e.preventDefault();
+  // formulario.querySelector('#formPedido').addEventListener('submit', async (e) => {
+  //   e.preventDefault();
     
-    const submitBtn = e.target.querySelector('button[type="submit"]');
-    const originalText = submitBtn.textContent;
-    submitBtn.textContent = 'Procesando...';
-    submitBtn.disabled = true;
+  //   const submitBtn = e.target.querySelector('button[type="submit"]');
+  //   const originalText = submitBtn.textContent;
+  //   submitBtn.textContent = 'Procesando...';
+  //   submitBtn.disabled = true;
     
-    try {
-      await guardarPedidoFirebase();
-      overlay.remove();
-      carrito = [];
-      guardarCarrito();
-      actualizarCarrito();
-      mostrarNotificacion('Pedido confirmado exitosamente');
-    } catch (error) {
-      console.error('Error al guardar pedido:', error);
-      mostrarNotificacion('Error al procesar el pedido. Inténtalo de nuevo.');
-      submitBtn.textContent = originalText;
-      submitBtn.disabled = false;
+  //   try {
+  //     await guardarPedidoFirebase();
+  //     overlay.remove();
+  //     carrito = [];
+  //     guardarCarrito();
+  //     actualizarCarrito();
+  //     mostrarNotificacion('Pedido confirmado exitosamente');
+  //   } catch (error) {
+  //     console.error('Error al guardar pedido:', error);
+  //     mostrarNotificacion('Error al procesar el pedido. Inténtalo de nuevo.');
+  //     submitBtn.textContent = originalText;
+  //     submitBtn.disabled = false;
+  //   }
+  // });
+
+  //NUEVO FORM PEDIDO EN EL FORMULARIO
+  
+formulario.querySelector('#formPedido').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  const originalText = submitBtn.textContent;
+  submitBtn.textContent = 'Verificando stock...';
+  submitBtn.disabled = true;
+  
+  try {
+    // Verificar stock de todos los productos antes de confirmar
+    console.log('🔍 Verificando stock de todos los productos...');
+    
+    for (const item of carrito) {
+      const productoId = identificarProductoId(item.producto);
+      if (!productoId) continue;
+      
+      const stockInfo = await obtenerStockActual(productoId);
+      
+      if (!stockInfo.activo) {
+        throw new Error(`${item.producto} ya no está disponible`);
+      }
+      
+      if (stockInfo.stock < item.cantidad) {
+        throw new Error(
+          `Stock insuficiente de ${item.producto}. ` +
+          `Solicitado: ${item.cantidad}, Disponible: ${stockInfo.stock}`
+        );
+      }
     }
-  });
+    
+    console.log('✅ Stock verificado correctamente');
+    
+    submitBtn.textContent = 'Procesando pedido...';
+    
+    await guardarPedidoFirebase();
+    overlay.remove();
+    carrito = [];
+    guardarCarrito();
+    actualizarCarrito();
+    mostrarNotificacion('✅ Pedido confirmado exitosamente');
+    
+  } catch (error) {
+    console.error('Error al guardar pedido:', error);
+    mostrarNotificacion(`❌ ${error.message}`);
+    submitBtn.textContent = originalText;
+    submitBtn.disabled = false;
+  }
+});
+
+
+console.log('✅ Sistema de verificación de stock agregado a agregarAlCarrito()');
 
   overlay.addEventListener('click', (e) => {
     if (e.target === overlay) overlay.remove();
   });
 };
+
+// async function guardarPedidoFirebase() {
+//   if (!firebaseModules.loaded) {
+//     await loadFirebase();
+//   }
+
+//   const { addDoc, collection } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+  
+//   const user = firebaseModules.auth.currentUser;
+//   if (!user) throw new Error('Usuario no autenticado');
+
+//   const nombre = document.getElementById('nombreCliente').value.trim();
+//   const telefono = document.getElementById('telefonoCliente').value.trim();
+//   const direccion = document.getElementById('direccionCliente').value.trim();
+//   const ciudad = document.getElementById('ciudadCliente').value.trim();
+//   const notas = document.getElementById('notas').value.trim();
+
+//   if (!nombre || !telefono || !direccion || !ciudad) {
+//     throw new Error('Por favor completa todos los campos obligatorios');
+//   }
+
+//   const pedidoData = {
+//     uid: user.uid,
+//     datosCliente: {
+//       nombre,
+//       telefono,
+//       direccion,
+//       ciudad,
+//       email: user.email,
+//       notas: notas
+//     },
+//     pedido: carrito,
+//     total: total,
+//     fecha: new Date().toISOString(),
+//     estado: 'pendiente'
+//   };
+
+//   await addDoc(collection(firebaseModules.db, "pedidos"), pedidoData);
+//   console.log("Pedido guardado exitosamente");
+// }
+
+// 1️⃣ AGREGAR estas funciones auxiliares ANTES de guardarPedidoFirebase()
+
+// Función para reducir stock de un producto específico
+async function reducirStockProducto(productoId, cantidad) {
+  const { doc, getDoc, updateDoc, Timestamp } = 
+    await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+  
+  const inventarioRef = doc(firebaseModules.db, 'inventario', productoId);
+  const inventarioSnap = await getDoc(inventarioRef);
+  
+  if (!inventarioSnap.exists()) {
+    console.warn(`  ⚠️ Inventario no encontrado para: ${productoId}`);
+    return;
+  }
+  
+  const stockActual = inventarioSnap.data().stock || 0;
+  const nuevoStock = Math.max(0, stockActual - cantidad);
+  
+  await updateDoc(inventarioRef, {
+    stock: nuevoStock,
+    ultimaActualizacion: Timestamp.now(),
+    ultimoMotivo: 'Venta automática'
+  });
+  
+  console.log(`  ✓ ${productoId}: ${stockActual} → ${nuevoStock} (-${cantidad})`);
+}
+
+// Función para reducir stock cuando se confirma un pedido
+async function reducirStockDesdePedido(pedidoData) {
+  console.log('📦 Reduciendo stock del pedido...', pedidoData);
+  
+  try {
+    const productosVendidos = [];
+    
+    // Iterar sobre cada producto en el pedido
+    for (const item of pedidoData.pedido) {
+      let cantidadTotal = item.cantidad;
+      const nombreProducto = item.producto.toLowerCase();
+      
+      console.log(`  Procesando: ${item.producto} x${item.cantidad}`);
+      
+      // Detectar promociones
+      if (nombreProducto.includes('promoción') || nombreProducto.includes('promocion')) {
+        
+        if (nombreProducto.includes('súper') || nombreProducto.includes('super')) {
+          // SÚPER PROMOCIÓN: 2 Caturra + 2 Bourbon
+          console.log('  🎁 Súper Promoción detectada');
+          
+          await reducirStockProducto('cafe-caturra', 2 * cantidadTotal);
+          await reducirStockProducto('cafe-bourbon', 2 * cantidadTotal);
+          
+          productosVendidos.push(
+            { nombre: 'Café Caturra', cantidad: 2 * cantidadTotal },
+            { nombre: 'Café Bourbon', cantidad: 2 * cantidadTotal }
+          );
+          
+        } else {
+          // PROMOCIÓN NORMAL: 1 Caturra + 1 Bourbon
+          console.log('  🎁 Promoción 1+1 detectada');
+          
+          await reducirStockProducto('cafe-caturra', cantidadTotal);
+          await reducirStockProducto('cafe-bourbon', cantidadTotal);
+          
+          productosVendidos.push(
+            { nombre: 'Café Caturra', cantidad: cantidadTotal },
+            { nombre: 'Café Bourbon', cantidad: cantidadTotal }
+          );
+        }
+        
+        continue;
+      }
+      
+      // Productos individuales
+      let productoId = null;
+      
+      if (nombreProducto.includes('bourbon')) {
+        productoId = 'cafe-bourbon';
+      } else if (nombreProducto.includes('caturra')) {
+        productoId = 'cafe-caturra';
+      }
+      
+      if (productoId) {
+        await reducirStockProducto(productoId, cantidadTotal);
+        productosVendidos.push({ nombre: item.producto, cantidad: cantidadTotal });
+      } else {
+        console.warn(`  ⚠️ Producto no identificado: ${item.producto}`);
+      }
+    }
+    
+    console.log('✅ Stock reducido:', productosVendidos);
+    return { success: true, productosVendidos };
+    
+  } catch (error) {
+    console.error('❌ Error reduciendo stock:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+
+// 2️⃣ REEMPLAZAR la función guardarPedidoFirebase() completa
 
 async function guardarPedidoFirebase() {
   if (!firebaseModules.loaded) {
@@ -400,9 +745,27 @@ async function guardarPedidoFirebase() {
     estado: 'pendiente'
   };
 
-  await addDoc(collection(firebaseModules.db, "pedidos"), pedidoData);
-  console.log("Pedido guardado exitosamente");
+  // 1️⃣ Guardar el pedido en Firebase
+  console.log('💾 Guardando pedido en Firebase...');
+  const docRef = await addDoc(collection(firebaseModules.db, "pedidos"), pedidoData);
+  console.log("✅ Pedido guardado exitosamente con ID:", docRef.id);
+  
+  // 2️⃣ Reducir el stock automáticamente
+  console.log('📦 Reduciendo stock del inventario...');
+  const resultadoStock = await reducirStockDesdePedido(pedidoData);
+  
+  if (resultadoStock.success) {
+    console.log('✅ Stock actualizado correctamente');
+    console.log('   Productos vendidos:', resultadoStock.productosVendidos);
+  } else {
+    console.warn('⚠️ Advertencia: El stock no se actualizó:', resultadoStock.error);
+    // No bloqueamos el pedido, solo advertimos
+  }
+  
+  return docRef.id;
 }
+
+console.log('✅ Sistema de reducción automática de stock agregado a guardarPedidoFirebase()');
 
 // ===== CONFIGURACIÓN DE INTERFAZ =====
 function configurarInterfaz() {
@@ -493,18 +856,108 @@ function configurarInterfaz() {
     configurarFormularioContacto();
   }
 
-  if (paginaActual.tieneProductos) {
-    const addToCartButtons = document.querySelectorAll(".add-to-cart-btn");
-    addToCartButtons.forEach(button => {
-      const producto = button.dataset.producto;
-      const precio = parseInt(button.dataset.precio);
+  // if (paginaActual.tieneProductos) {
+  //   const addToCartButtons = document.querySelectorAll(".add-to-cart-btn");
+  //   addToCartButtons.forEach(button => {
+  //     const producto = button.dataset.producto;
+  //     const precio = parseInt(button.dataset.precio);
       
-      button.onclick = () => window.agregarAlCarrito(producto, precio);
-    });
-  }
+  //     button.onclick = () => window.agregarAlCarrito(producto, precio);
+  //   });
+  // }
+
+  
 }
 
 // ===== AUTENTICACIÓN (CARGA DIFERIDA) =====
+// async function configurarAutenticacion() {
+//   const authBtn = document.getElementById('authBtn');
+//   const authMobileBtn = document.getElementById('authMobileBtn');
+//   const userWelcome = document.getElementById("userWelcome");
+//   const userName = document.getElementById("userName");
+//   const loginMessage = document.getElementById("loginMessage");
+
+//   const necesitaAuth = paginaActual.tieneCarrito || paginaActual.tienePedidos || paginaActual.tieneProductos;
+
+//   if (!necesitaAuth) {
+//     console.log('⏭️ Página no requiere autenticación');
+//     if (authBtn) authBtn.onclick = () => window.location.href = "auth.html";
+//     if (authMobileBtn) authMobileBtn.onclick = () => window.location.href = "auth.html";
+//     return;
+//   }
+
+//   console.log('🔐 Cargando Firebase y verificando sesión...');
+//   await loadFirebase();
+
+//   const { onAuthStateChanged, signOut } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+
+//   authListenerActive = true;
+
+//   unsubscribeAuth = onAuthStateChanged(firebaseModules.auth, async (user) => {
+//     if (user) {
+//       console.log('✅ Usuario autenticado:', user.uid);
+//       usuarioAutenticado = true;
+//       currentUserId = user.uid;
+      
+//       if (userName) userName.textContent = user.displayName || user.email.split('@')[0];
+//       if (userWelcome) userWelcome.style.display = "block";
+
+//       const logoutText = "Cerrar Sesión";
+//       if (authBtn) authBtn.textContent = logoutText;
+//       if (authMobileBtn) authMobileBtn.textContent = logoutText;
+
+//       const logoutFunction = async () => {
+//         try {
+//           await signOut(firebaseModules.auth);
+//           carrito = [];
+//           currentUserId = null;
+//           mostrarNotificacion("Sesión cerrada correctamente");
+//           setTimeout(() => window.location.reload(), 1000);
+//         } catch (error) {
+//           console.error('Error al cerrar sesión:', error);
+//           mostrarNotificacion("Error al cerrar sesión");
+//         }
+//       };
+
+//       if (authBtn) authBtn.onclick = logoutFunction;
+//       if (authMobileBtn) authMobileBtn.onclick = logoutFunction;
+
+//       if (loginMessage) loginMessage.style.display = "none";
+      
+//       if (paginaActual.tieneCarrito) {
+//         cargarCarrito();
+//       }
+      
+//       if (paginaActual.tienePedidos) {
+//         const cargarPedidosModule = await import('./cargarPedidos.js');
+//         await cargarPedidosModule.cargarPedidos(user.uid);
+//       }
+//     } else {
+//       console.log('❌ Usuario no autenticado');
+//       usuarioAutenticado = false;
+//       currentUserId = null;
+//       carrito = [];
+      
+//       if (userWelcome) userWelcome.style.display = "none";
+
+//       const loginText = "Iniciar Sesión";
+//       if (authBtn) authBtn.textContent = loginText;
+//       if (authMobileBtn) authMobileBtn.textContent = loginText;
+
+//       const loginFunction = () => window.location.href = "auth.html";
+
+//       if (authBtn) authBtn.onclick = loginFunction;
+//       if (authMobileBtn) authMobileBtn.onclick = loginFunction;
+
+//       if (paginaActual.tieneCarrito) {
+//         actualizarCarrito();
+//       }
+//     }
+//   });
+
+// }
+
+// ===== AUTENTICACIÓN (CARGA DIFERIDA) - VERSIÓN CORREGIDA =====
 async function configurarAutenticacion() {
   const authBtn = document.getElementById('authBtn');
   const authMobileBtn = document.getElementById('authMobileBtn');
@@ -513,6 +966,35 @@ async function configurarAutenticacion() {
   const loginMessage = document.getElementById("loginMessage");
 
   const necesitaAuth = paginaActual.tieneCarrito || paginaActual.tienePedidos || paginaActual.tieneProductos;
+
+  // 🆕 CARGAR PRODUCTOS PARA TODOS (autenticados o no)
+  if (paginaActual.tieneProductos) {
+    console.log('📦 Cargando productos...');
+    try {
+      const cargarProductosModule = await import('./cargarProductos.js');
+      await cargarProductosModule.cargarProductos();
+      
+      // 🔧 CRÍTICO: Configurar listeners de los botones DESPUÉS de cargar productos
+      console.log('🔘 Configurando botones de agregar al carrito...');
+      const addToCartButtons = document.querySelectorAll(".add-to-cart-btn");
+      console.log(`   Botones encontrados: ${addToCartButtons.length}`);
+      
+      addToCartButtons.forEach(button => {
+        const producto = button.dataset.producto;
+        const precio = parseInt(button.dataset.precio);
+        
+        button.onclick = () => {
+          console.log('🖱️ Clic en botón:', producto, precio);
+          window.agregarAlCarrito(producto, precio);
+        };
+      });
+      
+      console.log('✅ Botones configurados correctamente');
+      
+    } catch (error) {
+      console.error('❌ Error cargando productos:', error);
+    }
+  }
 
   if (!necesitaAuth) {
     console.log('⏭️ Página no requiere autenticación');
@@ -567,6 +1049,9 @@ async function configurarAutenticacion() {
         const cargarPedidosModule = await import('./cargarPedidos.js');
         await cargarPedidosModule.cargarPedidos(user.uid);
       }
+      
+      // Los productos ya se cargaron arriba con sus listeners configurados
+      
     } else {
       console.log('❌ Usuario no autenticado');
       usuarioAutenticado = false;
@@ -587,10 +1072,14 @@ async function configurarAutenticacion() {
       if (paginaActual.tieneCarrito) {
         actualizarCarrito();
       }
+      
+      // Los productos están visibles pero los botones mostrarán el mensaje de login
+      // cuando el usuario intente agregar sin estar autenticado
     }
   });
-
 }
+
+console.log('✅ configurarAutenticacion() actualizada con listeners de botones');
 
 // ===== FAQ =====
 function configurarFAQ() {

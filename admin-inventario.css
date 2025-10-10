@@ -1,0 +1,950 @@
+/* ============================================
+   ESTILOS ESPECÍFICOS PARA INVENTARIO
+   Mantiene el mismo estilo visual de admin.css
+   ============================================ */
+
+/* ============================================
+   RESUMEN DE INVENTARIO
+   ============================================ */
+.resumen-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.alertas-rapidas,
+.acciones-rapidas {
+  background: linear-gradient(145deg, 
+    rgba(255, 255, 255, 0.98) 0%, 
+    rgba(252, 248, 240, 0.95) 100%);
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 
+    0 8px 25px rgba(139, 69, 19, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(218, 165, 32, 0.15);
+}
+
+.alertas-rapidas h3,
+.acciones-rapidas h3 {
+  color: #2F1B14;
+  margin: 0 0 1.5rem 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ============================================
+   ALERTAS RÁPIDAS
+   ============================================ */
+#alertasRapidasLista {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.alerta-item {
+  padding: 1rem 1.2rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s ease;
+  border-left: 4px solid;
+}
+
+.alerta-item.critica {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #EF4444;
+}
+
+.alerta-item.advertencia {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: #F59E0B;
+}
+
+.alerta-item.info {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: #3B82F6;
+}
+
+.alerta-item:hover {
+  transform: translateX(5px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.alerta-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.alerta-contenido {
+  flex: 1;
+}
+
+.alerta-contenido strong {
+  display: block;
+  color: #2F1B14;
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+}
+
+.alerta-contenido span {
+  color: #4A5568;
+  font-size: 0.9rem;
+}
+
+/* ============================================
+   ACCIONES RÁPIDAS
+   ============================================ */
+.acciones-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.accion-card {
+  background: linear-gradient(135deg, #DAA520, #B8860B);
+  color: white;
+  border: none;
+  padding: 1.5rem;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  box-shadow: 0 4px 15px rgba(218, 165, 32, 0.3);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.accion-card:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(218, 165, 32, 0.4);
+}
+
+.accion-icon {
+  font-size: 2rem;
+}
+
+/* ============================================
+   FILTROS DE INVENTARIO
+   ============================================ */
+.filtros-inventario {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 1.2rem;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(139, 69, 19, 0.08);
+  border: 1px solid rgba(218, 165, 32, 0.15);
+}
+
+#buscarProducto {
+  flex: 1;
+  min-width: 250px;
+  padding: 0.9rem 1.2rem;
+  border: 2px solid rgba(139, 69, 19, 0.2);
+  border-radius: 10px;
+  background: white;
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+#buscarProducto:focus {
+  outline: none;
+  border-color: #DAA520;
+  box-shadow: 0 0 0 3px rgba(218, 165, 32, 0.1);
+}
+
+#filtroEstadoInventario {
+  padding: 0.9rem 1.2rem;
+  border: 2px solid rgba(139, 69, 19, 0.2);
+  border-radius: 10px;
+  background: white;
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  min-width: 180px;
+  cursor: pointer;
+}
+
+#filtroEstadoInventario:focus {
+  outline: none;
+  border-color: #DAA520;
+  box-shadow: 0 0 0 3px rgba(218, 165, 32, 0.1);
+}
+
+.btn-limpiar {
+  padding: 0.9rem 1.5rem;
+  background: linear-gradient(135deg, #64748b, #475569);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 10px rgba(100, 116, 139, 0.2);
+}
+
+.btn-limpiar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(100, 116, 139, 0.3);
+}
+
+/* ============================================
+   TABLA DE INVENTARIO
+   ============================================ */
+.tabla-inventario-wrapper {
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 5px 20px rgba(139, 69, 19, 0.1);
+  border: 1px solid rgba(218, 165, 32, 0.15);
+}
+
+.inventory-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.inventory-table thead {
+  background: linear-gradient(135deg, #2F1B14, #4A5568);
+  color: white;
+}
+
+.inventory-table th {
+  padding: 1.2rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.inventory-table tbody tr {
+  border-bottom: 1px solid rgba(218, 165, 32, 0.1);
+  transition: all 0.2s ease;
+}
+
+.inventory-table tbody tr:hover {
+  background: rgba(218, 165, 32, 0.05);
+}
+
+.inventory-table td {
+  padding: 1.2rem 1rem;
+  color: #2F1B14;
+}
+
+.inventory-table td.loading {
+  text-align: center;
+  padding: 3rem;
+  color: #4A5568;
+  font-style: italic;
+}
+
+/* ============================================
+   CONTROLES DE STOCK EN TABLA
+   ============================================ */
+.stock-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.stock-input {
+  width: 70px;
+  padding: 0.5rem;
+  border: 2px solid rgba(139, 69, 19, 0.2);
+  border-radius: 6px;
+  text-align: center;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.stock-input:focus {
+  outline: none;
+  border-color: #DAA520;
+}
+
+.stock-btn {
+  padding: 0.5rem 0.9rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+}
+
+.stock-btn.btn-decrease {
+  background: linear-gradient(135deg, #EF4444, #DC2626);
+  color: white;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
+}
+
+.stock-btn.btn-decrease:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.stock-btn.btn-increase {
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: white;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+}
+
+.stock-btn.btn-increase:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.stock-btn.btn-update {
+  background: linear-gradient(135deg, #3B82F6, #2563EB);
+  color: white;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.stock-btn.btn-update:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.stock-btn.btn-history {
+  background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+  color: white;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.2);
+  margin-top: 0.5rem;
+  width: 100%;
+}
+
+.stock-btn.btn-history:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+/* ============================================
+   TOGGLE SWITCH PARA ESTADO ACTIVO
+   ============================================ */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 26px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background: linear-gradient(135deg, #10B981, #059669);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+  transform: translateX(24px);
+}
+
+/* ============================================
+   BADGES DE STOCK
+   ============================================ */
+.stock-badge {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stock-badge.ok {
+  background: linear-gradient(135deg, #D1FAE5, #A7F3D0);
+  color: #065F46;
+}
+
+.stock-badge.bajo {
+  background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+  color: #92400E;
+  animation: pulse-warning 2s infinite;
+}
+
+.stock-badge.agotado {
+  background: linear-gradient(135deg, #FEE2E2, #FECACA);
+  color: #991B1B;
+}
+
+@keyframes pulse-warning {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* ============================================
+   ALERTAS GENERALES
+   ============================================ */
+#alertasContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.alerta-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 15px;
+  border-left: 5px solid;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.alerta-card:hover {
+  transform: translateX(5px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.alerta-card.critica {
+  border-color: #EF4444;
+  background: linear-gradient(to right, rgba(239, 68, 68, 0.05), white);
+}
+
+.alerta-card.advertencia {
+  border-color: #F59E0B;
+  background: linear-gradient(to right, rgba(245, 158, 11, 0.05), white);
+}
+
+.alerta-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.8rem;
+}
+
+.alerta-header h4 {
+  color: #2F1B14;
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.alerta-body p {
+  color: #4A5568;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ============================================
+   MOVIMIENTOS DE INVENTARIO
+   ============================================ */
+.filtros-movimientos {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 1.2rem;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(139, 69, 19, 0.08);
+  border: 1px solid rgba(218, 165, 32, 0.15);
+}
+
+.filtros-movimientos select,
+.filtros-movimientos input {
+  padding: 0.9rem 1.2rem;
+  border: 2px solid rgba(139, 69, 19, 0.2);
+  border-radius: 10px;
+  background: white;
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  min-width: 200px;
+}
+
+.movimientos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.movimiento-item {
+  background: white;
+  padding: 1.2rem;
+  border-radius: 12px;
+  border: 1px solid rgba(218, 165, 32, 0.15);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.movimiento-item:hover {
+  transform: translateX(5px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.movimiento-info {
+  flex: 1;
+}
+
+.movimiento-info strong {
+  display: block;
+  color: #2F1B14;
+  font-size: 1rem;
+  margin-bottom: 0.3rem;
+}
+
+.movimiento-info small {
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.movimiento-cantidad {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 1rem;
+  margin-right: 1rem;
+}
+
+.movimiento-cantidad.positivo {
+  background: linear-gradient(135deg, #D1FAE5, #A7F3D0);
+  color: #065F46;
+}
+
+.movimiento-cantidad.negativo {
+  background: linear-gradient(135deg, #FEE2E2, #FECACA);
+  color: #991B1B;
+}
+
+.movimiento-motivo {
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  background: rgba(218, 165, 32, 0.1);
+  color: #92400E;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* ============================================
+   MODALES
+   ============================================ */
+.modal-body .stock-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  color: #2F1B14;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group select {
+  padding: 0.9rem 1rem;
+  border: 2px solid rgba(139, 69, 19, 0.2);
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #DAA520;
+  box-shadow: 0 0 0 3px rgba(218, 165, 32, 0.1);
+}
+
+.stock-current-info {
+  background: rgba(218, 165, 32, 0.1);
+  padding: 1rem;
+  border-radius: 10px;
+  border-left: 4px solid #DAA520;
+}
+
+.stock-current-info p {
+  margin: 0.3rem 0;
+  color: #2F1B14;
+}
+
+.stock-current-info strong {
+  font-weight: 700;
+  color: #8B4513;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  justify-content: flex-end;
+}
+
+.btn-modal {
+  padding: 0.9rem 2rem;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+}
+
+.btn-modal.btn-cancelar {
+  background: linear-gradient(135deg, #64748b, #475569);
+  color: white;
+  box-shadow: 0 3px 10px rgba(100, 116, 139, 0.2);
+}
+
+.btn-modal.btn-guardar {
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: white;
+  box-shadow: 0 3px 10px rgba(16, 185, 129, 0.2);
+}
+
+.btn-modal:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Historial en Modal */
+.historial-lista {
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.historial-item {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(218, 165, 32, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.2s ease;
+}
+
+.historial-item:hover {
+  background: rgba(218, 165, 32, 0.05);
+}
+
+.historial-item:last-child {
+  border-bottom: none;
+}
+
+/* ============================================
+   ESTADOS VACÍOS
+   ============================================ */
+.empty-state-inventory {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #64748b;
+}
+
+.empty-state-inventory .icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.5;
+}
+
+.empty-state-inventory h3 {
+  color: #2F1B14;
+  margin: 1rem 0;
+  font-size: 1.5rem;
+}
+
+.empty-state-inventory p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+  .resumen-container {
+    grid-template-columns: 1fr;
+  }
+
+  .acciones-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .filtros-inventario {
+    flex-direction: column;
+  }
+
+  #buscarProducto,
+  #filtroEstadoInventario {
+    min-width: auto;
+    width: 100%;
+  }
+
+  .inventory-table {
+    font-size: 0.85rem;
+  }
+
+  .inventory-table th,
+  .inventory-table td {
+    padding: 0.8rem 0.5rem;
+  }
+
+  .stock-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .stock-input {
+    width: 100%;
+  }
+
+  .stock-btn {
+    width: 100%;
+  }
+
+  .movimiento-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .acciones-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
+
+  .btn-modal {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-container {
+    padding: 1rem;
+  }
+
+  .admin-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .inventory-table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .tabla-inventario-wrapper {
+    border-radius: 10px;
+  }
+}
+
+/* ============================================
+   SCROLLBAR PERSONALIZADO
+   ============================================ */
+.tabla-inventario-wrapper::-webkit-scrollbar,
+.historial-lista::-webkit-scrollbar,
+.movimientos-lista::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.tabla-inventario-wrapper::-webkit-scrollbar-track,
+.historial-lista::-webkit-scrollbar-track,
+.movimientos-lista::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.tabla-inventario-wrapper::-webkit-scrollbar-thumb,
+.historial-lista::-webkit-scrollbar-thumb,
+.movimientos-lista::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #DAA520, #B8860B);
+  border-radius: 4px;
+}
+
+.tabla-inventario-wrapper::-webkit-scrollbar-thumb:hover,
+.historial-lista::-webkit-scrollbar-thumb:hover,
+.movimientos-lista::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #B8860B, #8B4513);
+}
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tab-pane.active {
+  animation: fadeInUp 0.5s ease;
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.alerta-item,
+.movimiento-item {
+  animation: slideInFromLeft 0.4s ease;
+}
+
+/* Animación escalonada */
+.alerta-item:nth-child(1) { animation-delay: 0.1s; }
+.alerta-item:nth-child(2) { animation-delay: 0.15s; }
+.alerta-item:nth-child(3) { animation-delay: 0.2s; }
+.alerta-item:nth-child(4) { animation-delay: 0.25s; }
+.alerta-item:nth-child(5) { animation-delay: 0.3s; }
+
+.movimiento-item:nth-child(1) { animation-delay: 0.1s; }
+.movimiento-item:nth-child(2) { animation-delay: 0.15s; }
+.movimiento-item:nth-child(3) { animation-delay: 0.2s; }
+
+/* ============================================
+   UTILIDADES
+   ============================================ */
+.text-center {
+  text-align: center;
+}
+
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mt-3 { margin-top: 1.5rem; }
+.mb-1 { margin-bottom: 0.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+.mb-3 { margin-bottom: 1.5rem; }
+
+.hidden {
+  display: none !important;
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: #64748b;
+  font-style: italic;
+  font-size: 1.1rem;
+}
+
+/* ============================================
+   MEJORAS DE ACCESIBILIDAD
+   ============================================ */
+.stock-btn:focus,
+.btn-modal:focus,
+.toggle-switch input:focus + .toggle-slider {
+  outline: 3px solid rgba(218, 165, 32, 0.5);
+  outline-offset: 2px;
+}
+
+/* Alto contraste para mejor legibilidad */
+@media (prefers-contrast: high) {
+  .stock-badge,
+  .movimiento-cantidad {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Reducción de movimiento para usuarios con preferencias de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+/* Indicador de stock en la tabla */
+.stock-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.stock-badge.disponible {
+    background: #d4edda;
+    color: #155724;
+}
+
+.stock-badge.stock-bajo {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.stock-badge.agotado {
+    background: #f8d7da;
+    color: #721c24;
+}

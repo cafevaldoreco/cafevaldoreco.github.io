@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- CSP -->
+  <meta http-equiv="Content-Security-Policy" 
+        content="default-src 'self';
+                 script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.gstatic.com https://apis.google.com;
+                 style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+                 font-src 'self' https://fonts.gstatic.com;
+                 img-src 'self' data: https:;
+                 connect-src 'self' 
+                   https://www.gstatic.com 
+                   https://firestore.googleapis.com 
+                   https://identitytoolkit.googleapis.com 
+                   https://www.googleapis.com 
+                   https://cafelaesperanza-231a4.firebaseapp.com
+                   https://securetoken.googleapis.com;
+                 frame-src 'self' 
+                   https://cafelaesperanza-231a4.firebaseapp.com 
+                   https://apis.google.com;">
+
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Gestión de Inventario - Café Valdore">
+  <title>Inventario - Café Valdore Admin</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="admin.css">
+  <link rel="stylesheet" href="admin-inventario.css">
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <nav>
+      <a href="index.html" class="logo">
+        <img src="logo.webp" alt="Café Valdore" style="height: 120px;">
+      </a>
+      
+      <!-- Menú desktop -->
+      <ul class="nav-links">
+        <li><a href="index.html">🏠 Inicio</a></li>
+        <li><a href="admin.html">⚙️ Administración</a></li>
+        <li><a href="admin-inventario.html" class="active">📦 Inventario</a></li>
+        <li><button id="authBtn" class="auth-btn">🚪 Cerrar Sesión</button></li>
+      </ul>
+
+      <!-- Botón hamburguesa -->
+      <div class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </nav>
+
+    <!-- Menú móvil -->
+    <div class="mobile-menu" id="mobileMenu">
+      <ul>
+        <li><a href="index.html">🏠 Inicio</a></li>
+        <li><a href="admin.html">⚙️ Administración</a></li>
+        <li><a href="admin-inventario.html" class="active">📦 Inventario</a></li>
+        <li><button id="authMobileBtn" class="auth-btn">🚪 Cerrar Sesión</button></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Contenido principal -->
+  <main class="admin-container">
+    <div class="admin-header">
+      <h1>📦 Gestión de Inventario</h1>
+      <p>Control completo del stock y disponibilidad de productos</p>
+    </div>
+
+    <!-- Estadísticas de Inventario -->
+    <div class="admin-stats">
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div class="stat-info">
+          <h3 id="totalProductos">0</h3>
+          <p>Total Productos</p>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-info">
+          <h3 id="productosActivos">0</h3>
+          <p>Productos Activos</p>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">⚠️</div>
+        <div class="stat-info">
+          <h3 id="stockBajo">0</h3>
+          <p>Stock Bajo</p>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">🔴</div>
+        <div class="stat-info">
+          <h3 id="agotados">0</h3>
+          <p>Agotados</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">📈</div>
+        <div class="stat-info">
+          <h3 id="stockTotal">0</h3>
+          <p>Stock Total</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs y Acciones -->
+    <div class="admin-tabs-container">
+      <div class="admin-tabs">
+        <button class="tab-btn active" data-tab="resumen">📊 Resumen</button>
+        <button class="tab-btn" data-tab="inventario">📦 Inventario</button>
+        <button class="tab-btn" data-tab="alertas">⚠️ Alertas</button>
+        <button class="tab-btn" data-tab="movimientos">📜 Movimientos</button>
+      </div>
+      
+      <div class="admin-actions">
+        <button id="btnActualizar" class="btn-actualizar-tabs">🔄 Actualizar</button>
+        <button id="btnExportar" class="btn-actualizar-tabs" style="background: linear-gradient(135deg, #3B82F6, #2563EB);">
+          📥 Exportar CSV
+        </button>
+      </div>
+    </div>
+
+    <div class="tab-content">
+      <!-- TAB: RESUMEN -->
+      <div id="tab-resumen" class="tab-pane active">
+        <div class="resumen-container">
+          <div class="alertas-rapidas" id="alertasRapidas">
+            <h3>🚨 Alertas Rápidas</h3>
+            <div id="alertasRapidasLista">
+              <div class="loading">Cargando alertas...</div>
+            </div>
+          </div>
+
+          <div class="acciones-rapidas">
+            <h3>⚡ Acciones Rápidas</h3>
+            <div class="acciones-grid">
+              <button class="accion-card" onclick="verStockBajo()">
+                <span class="accion-icon">⚠️</span>
+                <span>Ver Stock Bajo</span>
+              </button>
+              <button class="accion-card" onclick="verAgotados()">
+                <span class="accion-icon">🔴</span>
+                <span>Ver Agotados</span>
+              </button>
+              <button class="accion-card" onclick="generarReporte()">
+                <span class="accion-icon">📊</span>
+                <span>Generar Reporte</span>
+              </button>
+              <button class="accion-card" onclick="sincronizarInventario()">
+                <span class="accion-icon">🔄</span>
+                <span>Sincronizar</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: INVENTARIO -->
+      <div id="tab-inventario" class="tab-pane">
+        <div class="filtros-inventario">
+          <input type="text" id="buscarProducto" placeholder="🔍 Buscar producto...">
+          <select id="filtroEstadoInventario">
+            <option value="todos">Todos</option>
+            <option value="activos">Activos</option>
+            <option value="inactivos">Inactivos</option>
+            <option value="stock-bajo">Stock Bajo</option>
+            <option value="agotados">Agotados</option>
+          </select>
+          <button onclick="limpiarFiltrosInventario()" class="btn-limpiar">🗑️ Limpiar</button>
+        </div>
+
+        <div class="tabla-inventario-wrapper">
+          <table class="inventory-table">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Stock Actual</th>
+                <th>Mínimo</th>
+                <th>Máximo</th>
+                <th>Estado</th>
+                <th>Última Act.</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="inventoryTableBody">
+              <tr>
+                <td colspan="7" class="loading">Cargando inventario...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB: ALERTAS -->
+      <div id="tab-alertas" class="tab-pane">
+        <div id="alertasContainer">
+          <div class="loading">Cargando alertas...</div>
+        </div>
+      </div>
+
+      <!-- TAB: MOVIMIENTOS -->
+      <div id="tab-movimientos" class="tab-pane">
+        <div class="filtros-movimientos">
+          <select id="filtroTipoMovimiento">
+            <option value="todos">Todos los movimientos</option>
+            <option value="ventas">Ventas</option>
+            <option value="reabastecimiento">Reabastecimiento</option>
+            <option value="ajuste-manual">Ajuste Manual</option>
+          </select>
+          <input type="date" id="filtroFechaMovimiento">
+        </div>
+
+        <div id="movimientosContainer" class="movimientos-lista">
+          <div class="loading">Cargando movimientos...</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal de Edición de Stock -->
+  <div id="modalStock" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>✏️ Editar Stock</h2>
+        <span class="close" onclick="cerrarModalStock()">&times;</span>
+      </div>
+      <div class="modal-body" id="modalStockBody">
+        <!-- Contenido dinámico -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Historial -->
+  <div id="modalHistorial" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📜 Historial de Movimientos</h2>
+        <span class="close" onclick="cerrarModalHistorial()">&times;</span>
+      </div>
+      <div class="modal-body" id="modalHistorialBody">
+        <!-- Contenido dinámico -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="auth-guard.js"></script>
+  <script type="module" src="inventory-manager.js"></script>
+  <script type="module" src="admin-inventario.js"></script>
+  <script type="module" src="version.js"></script>
+</body>
+</html>

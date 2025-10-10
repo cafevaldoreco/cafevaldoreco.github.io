@@ -1,6 +1,6 @@
 // version.js - Sistema de versionado y debugging
-const APP_VERSION = '1.2.0';
-const BUILD_DATE = '2025-10-09';
+const APP_VERSION = '2.0.0';
+const BUILD_DATE = '2025-10-10';
 
 console.log(`
 ╔════════════════════════════════════════╗
