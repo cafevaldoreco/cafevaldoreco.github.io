@@ -1,5 +1,5 @@
 // sw.js - Service Worker CORREGIDO
-const CACHE_VERSION = 'v1.2.0'; // ← Debe coincidir con version.js
+const CACHE_VERSION = 'v2.0.0'; // ← Debe coincidir con version.js
 const CACHE_NAME = `cafe-valdore-${CACHE_VERSION}`;
 
 // Recursos para cachear - ACTUALIZADO con tus archivos reales
@@ -12,6 +12,7 @@ const ASSETS_TO_CACHE = [
   '/pedidos.html',
   '/auth.html',
   '/admin-login.html',
+  '/admin-inventario.html',
 
   // CSS REALES que usas
   '/styles.css',
@@ -20,6 +21,7 @@ const ASSETS_TO_CACHE = [
   '/cerrarcarrito.css',
   '/contacto.css',
   '/productos.css',
+  '/admin-inventario.css',
 
   // JavaScript
   '/main.js',
@@ -27,6 +29,8 @@ const ASSETS_TO_CACHE = [
   '/chat.js',
   '/version.js',
   '/cargarPedidos.js',
+  '/cargarProductos.js',
+  '/admin-inventario.js',
 
   // Imágenes WebP
   '/bourbon.webp',

@@ -1,3 +1,4 @@
+/* styles.css */
 /* Reset básico */
 * {
   margin: 0;
@@ -1206,4 +1207,55 @@ main {
   .numero {
     align-self: center;
   }
+}
+
+/* Producto agotado */
+.producto-card.producto-agotado {
+    opacity: 0.7;
+    position: relative;
+}
+
+.producto-card.producto-agotado img {
+    filter: grayscale(50%);
+}
+
+/* Badge de agotado */
+.badge-agotado {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #dc3545;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.85rem;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+}
+
+/* Badge de stock bajo */
+.badge-stock-bajo {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #ffc107;
+    color: #000;
+    padding: 0.4rem 0.8rem;
+    border-radius: 15px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    z-index: 10;
+}
+
+/* Botón deshabilitado */
+.btn-agregar:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.btn-agregar:disabled:hover {
+    background: #6c757d;
+    transform: none;
 }
