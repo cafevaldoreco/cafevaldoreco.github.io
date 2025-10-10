@@ -212,7 +212,7 @@ function mostrarProductos(productos) {
         
         <div class="producto-info">
           <h3>${producto.nombre}</h3>
-          <p class="producto-descripcion">${producto.descripcion || ''}</p>
+          <p class="producto-descripcion">${(producto.descripcion || '').replace(/\n/g, '<br>')}</p>
           
           ${stockInfoHTML}
           
