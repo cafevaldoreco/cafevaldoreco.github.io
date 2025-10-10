@@ -1259,3 +1259,224 @@ main {
     background: #6c757d;
     transform: none;
 }
+
+/* ========================================
+   🎨 ESTILOS PARA BADGES DE STOCK
+   ======================================== */
+
+/* Badges en la imagen del producto */
+.badge-agotado,
+.badge-urgente,
+.badge-stock-bajo {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  font-weight: bold;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 2;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.badge-agotado {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+}
+
+.badge-urgente {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  animation: urgentPulse 1.5s ease-in-out infinite;
+}
+
+.badge-stock-bajo {
+  background: linear-gradient(135deg, #eab308, #ca8a04);
+  color: white;
+}
+
+/* Animación de pulso urgente */
+@keyframes urgentPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.6);
+  }
+}
+
+/* Animación de pulso normal */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+/* Información de stock debajo de la descripción */
+.stock-info {
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 1rem 0;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  animation: fadeIn 0.5s ease;
+}
+
+.stock-info.agotado {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.05));
+  color: #dc2626;
+  border: 2px solid rgba(239, 68, 68, 0.2);
+}
+
+.stock-info.urgente {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.1));
+  color: #d97706;
+  border: 2px solid rgba(245, 158, 11, 0.3);
+  animation: urgentGlow 2s ease-in-out infinite;
+}
+
+.stock-info.bajo {
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.1), rgba(202, 138, 4, 0.05));
+  color: #ca8a04;
+  border: 2px solid rgba(234, 179, 8, 0.2);
+}
+
+.stock-info.medio {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(22, 163, 74, 0.05));
+  color: #16a34a;
+  border: 2px solid rgba(34, 197, 94, 0.2);
+}
+
+/* Animación de brillo urgente */
+@keyframes urgentGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(245, 158, 11, 0);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Asegurar que producto-imagen sea relativo para los badges absolutos */
+.producto-imagen {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px 20px 0 0;
+}
+
+/* Producto agotado - efecto de opacidad */
+.producto-agotado {
+  opacity: 0.7;
+  position: relative;
+}
+
+.producto-agotado::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 25px;
+  pointer-events: none;
+}
+
+.producto-agotado .producto-imagen img {
+  filter: grayscale(30%);
+}
+
+/* Botón deshabilitado más visible */
+.add-to-cart-btn.disabled {
+  background: linear-gradient(135deg, #9ca3af, #6b7280) !important;
+  color: white !important;
+  cursor: not-allowed !important;
+  opacity: 0.8;
+}
+
+.add-to-cart-btn.disabled:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Loading spinner */
+.loading-productos {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #666;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  margin: 0 auto 1rem;
+  border: 4px solid rgba(218, 165, 32, 0.2);
+  border-top-color: #DAA520;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-productos p {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+/* Responsive - Badges más pequeños en móvil */
+@media (max-width: 768px) {
+  .badge-agotado,
+  .badge-urgente,
+  .badge-stock-bajo {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.8rem;
+    top: 10px;
+    right: 10px;
+  }
+
+  .stock-info {
+    font-size: 0.85rem;
+    padding: 0.6rem 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .badge-agotado,
+  .badge-urgente,
+  .badge-stock-bajo {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  .stock-info {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.6rem;
+  }
+}
