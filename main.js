@@ -645,6 +645,77 @@ async function reducirStockProducto(productoId, cantidad) {
 }
 
 // Función para reducir stock cuando se confirma un pedido
+// async function reducirStockDesdePedido(pedidoData) {
+//   console.log('📦 Reduciendo stock del pedido...', pedidoData);
+  
+//   try {
+//     const productosVendidos = [];
+    
+//     // Iterar sobre cada producto en el pedido
+//     for (const item of pedidoData.pedido) {
+//       let cantidadTotal = item.cantidad;
+//       const nombreProducto = item.producto.toLowerCase();
+      
+//       console.log(`  Procesando: ${item.producto} x${item.cantidad}`);
+      
+//       // Detectar promociones
+//       if (nombreProducto.includes('promoción') || nombreProducto.includes('promocion')) {
+        
+//         if (nombreProducto.includes('súper') || nombreProducto.includes('super')) {
+//           // SÚPER PROMOCIÓN: 2 Caturra + 2 Bourbon
+//           console.log('  🎁 Súper Promoción detectada');
+          
+//           await reducirStockProducto('cafe-caturra', 2 * cantidadTotal);
+//           await reducirStockProducto('cafe-bourbon', 2 * cantidadTotal);
+          
+//           productosVendidos.push(
+//             { nombre: 'Café Caturra', cantidad: 2 * cantidadTotal },
+//             { nombre: 'Café Bourbon', cantidad: 2 * cantidadTotal }
+//           );
+          
+//         } else {
+//           // PROMOCIÓN NORMAL: 1 Caturra + 1 Bourbon
+//           console.log('  🎁 Promoción 1+1 detectada');
+          
+//           await reducirStockProducto('cafe-caturra', cantidadTotal);
+//           await reducirStockProducto('cafe-bourbon', cantidadTotal);
+          
+//           productosVendidos.push(
+//             { nombre: 'Café Caturra', cantidad: cantidadTotal },
+//             { nombre: 'Café Bourbon', cantidad: cantidadTotal }
+//           );
+//         }
+        
+//         continue;
+//       }
+      
+//       // Productos individuales
+//       let productoId = null;
+      
+//       if (nombreProducto.includes('bourbon')) {
+//         productoId = 'cafe-bourbon';
+//       } else if (nombreProducto.includes('caturra')) {
+//         productoId = 'cafe-caturra';
+//       }
+      
+//       if (productoId) {
+//         await reducirStockProducto(productoId, cantidadTotal);
+//         productosVendidos.push({ nombre: item.producto, cantidad: cantidadTotal });
+//       } else {
+//         console.warn(`  ⚠️ Producto no identificado: ${item.producto}`);
+//       }
+//     }
+    
+//     console.log('✅ Stock reducido:', productosVendidos);
+//     return { success: true, productosVendidos };
+    
+//   } catch (error) {
+//     console.error('❌ Error reduciendo stock:', error);
+//     return { success: false, error: error.message };
+//   }
+// }
+
+// Función para reducir stock cuando se confirma un pedido - VERSIÓN CORREGIDA
 async function reducirStockDesdePedido(pedidoData) {
   console.log('📦 Reduciendo stock del pedido...', pedidoData);
   
@@ -658,29 +729,39 @@ async function reducirStockDesdePedido(pedidoData) {
       
       console.log(`  Procesando: ${item.producto} x${item.cantidad}`);
       
-      // Detectar promociones
+      // Detectar promociones y reducir stock de LA PROMOCIÓN MISMA
       if (nombreProducto.includes('promoción') || nombreProducto.includes('promocion')) {
         
         if (nombreProducto.includes('súper') || nombreProducto.includes('super')) {
-          // SÚPER PROMOCIÓN: 2 Caturra + 2 Bourbon
-          console.log('  🎁 Súper Promoción detectada');
+          // SÚPER PROMOCIÓN: Reducir stock de super-promocion Y de los productos individuales
+          console.log('  🎁 Súper Promoción detectada - Restando stock de super-promocion y productos individuales');
           
+          // 1️⃣ REDUCIR STOCK DE LA PROMOCIÓN MISMA
+          await reducirStockProducto('super-promocion', cantidadTotal);
+          
+          // 2️⃣ REDUCIR STOCK DE PRODUCTOS INDIVIDUALES
           await reducirStockProducto('cafe-caturra', 2 * cantidadTotal);
           await reducirStockProducto('cafe-bourbon', 2 * cantidadTotal);
           
           productosVendidos.push(
+            { nombre: 'Super Promoción', cantidad: cantidadTotal },
             { nombre: 'Café Caturra', cantidad: 2 * cantidadTotal },
             { nombre: 'Café Bourbon', cantidad: 2 * cantidadTotal }
           );
           
         } else {
-          // PROMOCIÓN NORMAL: 1 Caturra + 1 Bourbon
-          console.log('  🎁 Promoción 1+1 detectada');
+          // PROMOCIÓN NORMAL: Reducir stock de promocion-bourbon-caturra Y de los productos individuales
+          console.log('  🎁 Promoción 1+1 detectada - Restando stock de promocion-bourbon-caturra y productos individuales');
           
+          // 1️⃣ REDUCIR STOCK DE LA PROMOCIÓN MISMA
+          await reducirStockProducto('promocion-bourbon-caturra', cantidadTotal); // ← CAMBIO AQUÍ
+          
+          // 2️⃣ REDUCIR STOCK DE PRODUCTOS INDIVIDUALES
           await reducirStockProducto('cafe-caturra', cantidadTotal);
           await reducirStockProducto('cafe-bourbon', cantidadTotal);
           
           productosVendidos.push(
+            { nombre: 'Promoción Bourbon + Caturra', cantidad: cantidadTotal }, // ← CAMBIO AQUÍ
             { nombre: 'Café Caturra', cantidad: cantidadTotal },
             { nombre: 'Café Bourbon', cantidad: cantidadTotal }
           );
@@ -706,7 +787,7 @@ async function reducirStockDesdePedido(pedidoData) {
       }
     }
     
-    console.log('✅ Stock reducido:', productosVendidos);
+    console.log('✅ Stock reducido correctamente:', productosVendidos);
     return { success: true, productosVendidos };
     
   } catch (error) {
@@ -714,7 +795,6 @@ async function reducirStockDesdePedido(pedidoData) {
     return { success: false, error: error.message };
   }
 }
-
 
 // 2️⃣ REEMPLAZAR la función guardarPedidoFirebase() completa
 
