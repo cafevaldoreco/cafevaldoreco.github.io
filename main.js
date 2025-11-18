@@ -717,7 +717,7 @@ async function reducirStockProducto(productoId, cantidad) {
 
 // Función para reducir stock cuando se confirma un pedido - VERSIÓN CORREGIDA
 async function reducirStockDesdePedido(pedidoData) {
-  console.log('📦 Reduciendo stock del pedido...', pedidoData);
+  // console.log('📦 Reduciendo stock del pedido...', pedidoData);
   
   try {
     const productosVendidos = [];
@@ -734,7 +734,7 @@ async function reducirStockDesdePedido(pedidoData) {
         
         if (nombreProducto.includes('súper') || nombreProducto.includes('super')) {
           // SÚPER PROMOCIÓN: Reducir stock de super-promocion Y de los productos individuales
-          console.log('  🎁 Súper Promoción detectada - Restando stock de super-promocion y productos individuales');
+          // console.log('  🎁 Súper Promoción detectada - Restando stock de super-promocion y productos individuales');
           
           // 1️⃣ REDUCIR STOCK DE LA PROMOCIÓN MISMA
           await reducirStockProducto('super-promocion', cantidadTotal);
@@ -787,7 +787,7 @@ async function reducirStockDesdePedido(pedidoData) {
       }
     }
     
-    console.log('✅ Stock reducido correctamente:', productosVendidos);
+    // console.log('✅ Stock reducido correctamente:', productosVendidos);
     return { success: true, productosVendidos };
     
   } catch (error) {
@@ -798,6 +798,63 @@ async function reducirStockDesdePedido(pedidoData) {
 
 // 2️⃣ REEMPLAZAR la función guardarPedidoFirebase() completa
 
+// async function guardarPedidoFirebase() {
+//   if (!firebaseModules.loaded) {
+//     await loadFirebase();
+//   }
+
+//   const { addDoc, collection } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+  
+//   const user = firebaseModules.auth.currentUser;
+//   if (!user) throw new Error('Usuario no autenticado');
+
+//   const nombre = document.getElementById('nombreCliente').value.trim();
+//   const telefono = document.getElementById('telefonoCliente').value.trim();
+//   const direccion = document.getElementById('direccionCliente').value.trim();
+//   const ciudad = document.getElementById('ciudadCliente').value.trim();
+//   const notas = document.getElementById('notas').value.trim();
+
+//   if (!nombre || !telefono || !direccion || !ciudad) {
+//     throw new Error('Por favor completa todos los campos obligatorios');
+//   }
+
+//   const pedidoData = {
+//     uid: user.uid,
+//     datosCliente: {
+//       nombre,
+//       telefono,
+//       direccion,
+//       ciudad,
+//       email: user.email,
+//       notas: notas
+//     },
+//     pedido: carrito,
+//     total: total,
+//     fecha: new Date().toISOString(),
+//     estado: 'pendiente'
+//   };
+
+//   // 1️⃣ Guardar el pedido en Firebase
+//   console.log('💾 Guardando pedido en Firebase...');
+//   const docRef = await addDoc(collection(firebaseModules.db, "pedidos"), pedidoData);
+//   console.log("✅ Pedido guardado exitosamente con ID:", docRef.id);
+  
+//   // 2️⃣ Reducir el stock automáticamente
+//   console.log('📦 Reduciendo stock del inventario...');
+//   const resultadoStock = await reducirStockDesdePedido(pedidoData);
+  
+//   if (resultadoStock.success) {
+//     console.log('✅ Stock actualizado correctamente');
+//     console.log('   Productos vendidos:', resultadoStock.productosVendidos);
+//   } else {
+//     console.warn('⚠️ Advertencia: El stock no se actualizó:', resultadoStock.error);
+//     // No bloqueamos el pedido, solo advertimos
+//   }
+  
+//   return docRef.id;
+// }
+
+// Función guardarPedidoFirebase - VERSIÓN FINAL
 async function guardarPedidoFirebase() {
   if (!firebaseModules.loaded) {
     await loadFirebase();
@@ -831,30 +888,118 @@ async function guardarPedidoFirebase() {
     pedido: carrito,
     total: total,
     fecha: new Date().toISOString(),
-    estado: 'pendiente'
+    estado: 'pendiente',
+    numeroPedido: 'PED' + Date.now()
   };
 
   // 1️⃣ Guardar el pedido en Firebase
-  console.log('💾 Guardando pedido en Firebase...');
+  // console.log('💾 Guardando pedido en Firebase...');
   const docRef = await addDoc(collection(firebaseModules.db, "pedidos"), pedidoData);
-  console.log("✅ Pedido guardado exitosamente con ID:", docRef.id);
+  // console.log("✅ Pedido guardado exitosamente con ID:", docRef.id);
   
   // 2️⃣ Reducir el stock automáticamente
-  console.log('📦 Reduciendo stock del inventario...');
+  // console.log('📦 Reduciendo stock del inventario...');
   const resultadoStock = await reducirStockDesdePedido(pedidoData);
   
   if (resultadoStock.success) {
-    console.log('✅ Stock actualizado correctamente');
-    console.log('   Productos vendidos:', resultadoStock.productosVendidos);
+    // console.log('✅ Stock actualizado correctamente');
   } else {
-    console.warn('⚠️ Advertencia: El stock no se actualizó:', resultadoStock.error);
-    // No bloqueamos el pedido, solo advertimos
+    console.warn('⚠️ El stock no se actualizó:', resultadoStock.error);
+  }
+
+  // 3️⃣ ENVIAR NOTIFICACIÓN POR CORREO (AUTOMÁTICO)
+  try {
+    await enviarNotificacionCorreo(pedidoData, docRef.id);
+    // console.log('✅ Correo de confirmación enviado automáticamente');
+    
+    // Mostrar confirmación al usuario
+    mostrarNotificacion(`✅ Pedido confirmado! Se envió un correo a ${user.email}`);
+    
+  } catch (emailError) {
+    console.warn('⚠️ El pedido se guardó pero el correo falló:', emailError);
+    mostrarNotificacion('✅ Pedido confirmado! (El correo no pudo enviarse)');
   }
   
   return docRef.id;
 }
 
-console.log('✅ Sistema de reducción automática de stock agregado a guardarPedidoFirebase()');
+// Función para enviar notificación por correo - VERSIÓN MEJORADA
+async function enviarNotificacionCorreo(pedidoData, pedidoId) {
+  // console.log('📧 Iniciando envío de correo automático...');
+  
+  // Verificar que EmailJS esté cargado
+  if (typeof emailjs === 'undefined') {
+    throw new Error('EmailJS no está disponible. Verifica el script en el HTML.');
+  }
+
+  // Verificar que tenemos email del cliente
+  if (!pedidoData.datosCliente.email) {
+    throw new Error('No hay email del cliente para enviar la confirmación');
+  }
+
+  // console.log('📍 Enviando correo a:', pedidoData.datosCliente.email);
+
+  const templateParams = {
+    to_email: pedidoData.datosCliente.email,
+    to_name: pedidoData.datosCliente.nombre,
+    from_name: "Café Valdore",
+    pedido_id: pedidoId,
+    cliente_nombre: pedidoData.datosCliente.nombre,
+    cliente_telefono: pedidoData.datosCliente.telefono,
+    cliente_direccion: pedidoData.datosCliente.direccion,
+    cliente_ciudad: pedidoData.datosCliente.ciudad,
+    total_pedido: `$${pedidoData.total.toLocaleString()}`,
+    fecha_pedido: new Date(pedidoData.fecha).toLocaleDateString('es-ES', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }),
+    productos: pedidoData.pedido.map(item => 
+      `• ${item.producto} x${item.cantidad} - $${(item.precio * item.cantidad).toLocaleString()}`
+    ).join('\n'),
+    observaciones: pedidoData.datosCliente.notas || 'Ninguna',
+    total_productos: pedidoData.pedido.reduce((sum, item) => sum + item.cantidad, 0)
+  };
+
+  // console.log('📨 Configurando plantilla de correo...');
+
+  try {
+    // Enviar correo usando EmailJS
+    const response = await emailjs.send(
+      'service_notbbed',    // Tu Service ID
+      'template_dofpifq',   // Tu Template ID
+      templateParams
+    );
+    
+    console.log('✅ Correo enviado exitosamente');
+    console.log('📩 Respuesta:', response.status, response.text);
+    
+    return response;
+    
+  } catch (error) {
+    console.error('❌ Error enviando correo:', error);
+    
+    // Proporcionar información útil del error
+    let mensajeError = 'Error al enviar el correo';
+    
+    if (error.status === 400) {
+      mensajeError = 'Service ID o Template ID incorrectos';
+    } else if (error.status === 401) {
+      mensajeError = 'Problema de autenticación con EmailJS';
+    } else if (error.status === 429) {
+      mensajeError = 'Límite de emails excedido';
+    } else if (error.text) {
+      mensajeError = error.text;
+    }
+    
+    throw new Error(mensajeError);
+  }
+}
+
+// console.log('✅ Sistema de reducción automática de stock agregado a guardarPedidoFirebase()');
 
 // ===== CONFIGURACIÓN DE INTERFAZ =====
 function configurarInterfaz() {
@@ -1066,14 +1211,14 @@ async function configurarAutenticacion() {
       // 🔧 CRÍTICO: Configurar listeners de los botones DESPUÉS de cargar productos
       console.log('🔘 Configurando botones de agregar al carrito...');
       const addToCartButtons = document.querySelectorAll(".add-to-cart-btn");
-      console.log(`   Botones encontrados: ${addToCartButtons.length}`);
+      // console.log(`   Botones encontrados: ${addToCartButtons.length}`);
       
       addToCartButtons.forEach(button => {
         const producto = button.dataset.producto;
         const precio = parseInt(button.dataset.precio);
         
         button.onclick = () => {
-          console.log('🖱️ Clic en botón:', producto, precio);
+          // console.log('🖱️ Clic en botón:', producto, precio);
           window.agregarAlCarrito(producto, precio);
         };
       });
@@ -1086,7 +1231,7 @@ async function configurarAutenticacion() {
   }
 
   if (!necesitaAuth) {
-    console.log('⏭️ Página no requiere autenticación');
+    // console.log('⏭️ Página no requiere autenticación');
     if (authBtn) authBtn.onclick = () => window.location.href = "auth.html";
     if (authMobileBtn) authMobileBtn.onclick = () => window.location.href = "auth.html";
     return;
@@ -1101,7 +1246,7 @@ async function configurarAutenticacion() {
 
   unsubscribeAuth = onAuthStateChanged(firebaseModules.auth, async (user) => {
     if (user) {
-      console.log('✅ Usuario autenticado:', user.uid);
+      // console.log('✅ Usuario autenticado:', user.uid);
       usuarioAutenticado = true;
       currentUserId = user.uid;
       
@@ -1168,7 +1313,7 @@ async function configurarAutenticacion() {
   });
 }
 
-console.log('✅ configurarAutenticacion() actualizada con listeners de botones');
+// console.log('✅ configurarAutenticacion() actualizada con listeners de botones');
 
 // ===== FAQ =====
 function configurarFAQ() {
@@ -1253,8 +1398,8 @@ function configurarChatVerificacion() {
 
 // ===== INICIALIZACIÓN =====
 document.addEventListener('DOMContentLoaded', async () => {
-  console.log('🚀 Inicializando aplicación optimizada...');
-  console.log('📄 Funcionalidades detectadas:', paginaActual);
+  // console.log('🚀 Inicializando aplicación optimizada...');
+  // console.log('📄 Funcionalidades detectadas:', paginaActual);
   
   configurarInterfaz();
   configurarChatVerificacion();
