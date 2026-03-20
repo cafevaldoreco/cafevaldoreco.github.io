@@ -134,7 +134,7 @@ function mostrarPedidos(pedidos) {
       <div class="pedido-card">
         <div class="pedido-header">
           <div class="pedido-id">
-            Pedido #${pedido.id.substring(0, 8)}
+            Pedido #${pedido.numeroPedido || pedido.id.substring(0, 8)}
           </div>
           <div class="pedido-fecha">
             ${fechaFormateada}

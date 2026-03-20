@@ -943,7 +943,7 @@ async function enviarNotificacionCorreo(pedidoData, pedidoId) {
     to_email: pedidoData.datosCliente.email,
     to_name: pedidoData.datosCliente.nombre,
     from_name: "Café Valdore",
-    pedido_id: pedidoId,
+    pedido_id: pedidoData.numeroPedido || pedidoId,
     cliente_nombre: pedidoData.datosCliente.nombre,
     cliente_telefono: pedidoData.datosCliente.telefono,
     cliente_direccion: pedidoData.datosCliente.direccion,
