@@ -132,25 +132,18 @@
       <div class="tab-content">
         <!-- Panel de Pedidos -->
         <div id="tab-pedidos" class="tab-pane active">
-          <!-- FILTROS SIMPLIFICADOS SIN BOTÓN -->
-          <!-- <div class="filtros-pedidos-simple">
-            <select id="filtroEstado">
-              <option value="todos">Todos los estados</option>
-              <option value="pendiente">Pendientes</option>
-              <option value="en-proceso">En proceso</option>
-              <option value="completado">Completados</option>
-            </select>
-            <input type="date" id="filtroFecha" placeholder="Filtrar por fecha">
-          </div> -->
-
+          
           <!-- FILTROS SIMPLIFICADOS CON BOTÓN LIMPIAR -->
           <div class="filtros-pedidos-simple">
   <select id="filtroEstado">
-    <option value="todos">Todos los estados</option>
-    <option value="pendiente">Pendientes</option>
-    <option value="en-proceso">En proceso</option>
-    <option value="completado">Completados</option>
-  </select>
+  <option value="todos">Todos los estados</option>
+  <option value="pendiente">Pendientes</option>
+  <option value="pendiente-pago">Pendiente de pago</option>
+  <option value="pagado">Pagados</option>
+  <option value="pago-rechazado">Pago rechazado</option>
+  <option value="en-proceso">En proceso</option>
+  <option value="completado">Completados</option>
+</select>
   
   <input type="date" id="filtroFecha" placeholder="Filtrar por fecha">
   

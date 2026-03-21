@@ -723,9 +723,13 @@ function formatearPrecio(precio) {
 
 function formatearEstado(estado) {
   const estados = {
-    'pendiente': 'Pendiente',
-    'en-proceso': 'En Proceso',
-    'completado': 'Completado'
+    'pendiente': '🟡 Pendiente',
+    'pendiente-pago': '⏳ Pendiente de pago',
+    'pagado': '💳 Pagado',
+    'pago-rechazado': '❌ Pago rechazado',
+    'pago-cancelado': '🚫 Pago cancelado',
+    'en-proceso': '🔄 En Proceso',
+    'completado': '✅ Completado'
   };
   return estados[estado] || 'Pendiente';
 }
