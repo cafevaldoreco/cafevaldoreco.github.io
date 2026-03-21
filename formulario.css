@@ -351,3 +351,30 @@ form input:valid {
 .form-container::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(135deg, #DAA520, #DAA520);
 }
+
+/* Se agrega los estilos de los métodos de pago */
+
+.metodos-pago {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 15px 0;
+}
+
+.metodo-pago-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px;
+  border: 2px solid #e8d5c4;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: border-color 0.2s;
+}
+
+.metodo-pago-option:has(input:checked) {
+  border-color: #8B4513;
+  background: #fff9f5;
+}
+

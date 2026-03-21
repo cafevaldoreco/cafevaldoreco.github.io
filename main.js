@@ -482,6 +482,18 @@ window.mostrarFormularioPedido = function() {
       <input type="text" id="direccionCliente" placeholder="Dirección completa *" required>
       <input type="text" id="ciudadCliente" placeholder="Ciudad *" required>
       <textarea id="notas" placeholder="Observaciones adicionales (opcional)" rows="3"></textarea>
+
+      <h3>Método de pago:</h3>
+      <div class="metodos-pago">
+        <label class="metodo-pago-option">
+          <input type="radio" name="metodoPago" value="wompi" checked>
+          💳 Pagar ahora (tarjeta, PSE, Nequi)
+        </label>
+        <label class="metodo-pago-option">
+          <input type="radio" name="metodoPago" value="contraentrega">
+          🚚 Pago contra entrega
+        </label>
+      </div>
       
       <div class="form-buttons">
         <button type="button" id="cancelarPedido">Cancelar</button>
@@ -495,32 +507,8 @@ window.mostrarFormularioPedido = function() {
 
   formulario.querySelector('#cancelarPedido').addEventListener('click', () => overlay.remove());
 
-  // formulario.querySelector('#formPedido').addEventListener('submit', async (e) => {
-  //   e.preventDefault();
-    
-  //   const submitBtn = e.target.querySelector('button[type="submit"]');
-  //   const originalText = submitBtn.textContent;
-  //   submitBtn.textContent = 'Procesando...';
-  //   submitBtn.disabled = true;
-    
-  //   try {
-  //     await guardarPedidoFirebase();
-  //     overlay.remove();
-  //     carrito = [];
-  //     guardarCarrito();
-  //     actualizarCarrito();
-  //     mostrarNotificacion('Pedido confirmado exitosamente');
-  //   } catch (error) {
-  //     console.error('Error al guardar pedido:', error);
-  //     mostrarNotificacion('Error al procesar el pedido. Inténtalo de nuevo.');
-  //     submitBtn.textContent = originalText;
-  //     submitBtn.disabled = false;
-  //   }
-  // });
-
   //NUEVO FORM PEDIDO EN EL FORMULARIO
-  
-formulario.querySelector('#formPedido').addEventListener('submit', async (e) => {
+ formulario.querySelector('#formPedido').addEventListener('submit', async (e) => {
   e.preventDefault();
   
   const submitBtn = e.target.querySelector('button[type="submit"]');
@@ -528,10 +516,15 @@ formulario.querySelector('#formPedido').addEventListener('submit', async (e) => 
   submitBtn.textContent = 'Verificando stock...';
   submitBtn.disabled = true;
   
+const metodoPagoEl = formulario.querySelector('input[name="metodoPago"]:checked');
+console.log('Elemento encontrado:', metodoPagoEl);
+console.log('Todos los radios:', formulario.querySelectorAll('input[name="metodoPago"]'));
+
+const metodoPago = metodoPagoEl ? metodoPagoEl.value : 'contraentrega';
+
+
   try {
-    // Verificar stock de todos los productos antes de confirmar
-    console.log('🔍 Verificando stock de todos los productos...');
-    
+    // Verificar stock
     for (const item of carrito) {
       const productoId = identificarProductoId(item.producto);
       if (!productoId) continue;
@@ -541,7 +534,6 @@ formulario.querySelector('#formPedido').addEventListener('submit', async (e) => 
       if (!stockInfo.activo) {
         throw new Error(`${item.producto} ya no está disponible`);
       }
-      
       if (stockInfo.stock < item.cantidad) {
         throw new Error(
           `Stock insuficiente de ${item.producto}. ` +
@@ -549,18 +541,26 @@ formulario.querySelector('#formPedido').addEventListener('submit', async (e) => 
         );
       }
     }
-    
-    console.log('✅ Stock verificado correctamente');
-    
+
     submitBtn.textContent = 'Procesando pedido...';
-    
-    await guardarPedidoFirebase();
-    overlay.remove();
-    carrito = [];
-    guardarCarrito();
-    actualizarCarrito();
-    mostrarNotificacion('✅ Pedido confirmado exitosamente');
-    
+
+    // Guardar pedido
+    const pedidoId = await guardarPedidoFirebase(metodoPago);
+
+    if (metodoPago === 'wompi') {
+  overlay.remove();
+  carrito = [];
+  guardarCarrito();
+  actualizarCarrito();
+  await abrirPagoWompi(pedidoId);
+} else {
+  overlay.remove();
+  carrito = [];
+  guardarCarrito();
+  actualizarCarrito();
+  mostrarNotificacion('✅ Pedido confirmado. Pago contra entrega.');
+}
+
   } catch (error) {
     console.error('Error al guardar pedido:', error);
     mostrarNotificacion(`❌ ${error.message}`);
@@ -577,47 +577,6 @@ console.log('✅ Sistema de verificación de stock agregado a agregarAlCarrito()
   });
 };
 
-// async function guardarPedidoFirebase() {
-//   if (!firebaseModules.loaded) {
-//     await loadFirebase();
-//   }
-
-//   const { addDoc, collection } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-  
-//   const user = firebaseModules.auth.currentUser;
-//   if (!user) throw new Error('Usuario no autenticado');
-
-//   const nombre = document.getElementById('nombreCliente').value.trim();
-//   const telefono = document.getElementById('telefonoCliente').value.trim();
-//   const direccion = document.getElementById('direccionCliente').value.trim();
-//   const ciudad = document.getElementById('ciudadCliente').value.trim();
-//   const notas = document.getElementById('notas').value.trim();
-
-//   if (!nombre || !telefono || !direccion || !ciudad) {
-//     throw new Error('Por favor completa todos los campos obligatorios');
-//   }
-
-//   const pedidoData = {
-//     uid: user.uid,
-//     datosCliente: {
-//       nombre,
-//       telefono,
-//       direccion,
-//       ciudad,
-//       email: user.email,
-//       notas: notas
-//     },
-//     pedido: carrito,
-//     total: total,
-//     fecha: new Date().toISOString(),
-//     estado: 'pendiente'
-//   };
-
-//   await addDoc(collection(firebaseModules.db, "pedidos"), pedidoData);
-//   console.log("Pedido guardado exitosamente");
-// }
-
-// 1️⃣ AGREGAR estas funciones auxiliares ANTES de guardarPedidoFirebase()
 
 // Función para reducir stock de un producto específico
 async function reducirStockProducto(productoId, cantidad) {
@@ -796,66 +755,42 @@ async function reducirStockDesdePedido(pedidoData) {
   }
 }
 
-// 2️⃣ REEMPLAZAR la función guardarPedidoFirebase() completa
+// ===== PAGO CON WOMPI =====
+async function abrirPagoWompi(numeroPedido) {
+  try {
+    mostrarNotificacion('⏳ Preparando pasarela de pago...');
 
-// async function guardarPedidoFirebase() {
-//   if (!firebaseModules.loaded) {
-//     await loadFirebase();
-//   }
+    const montoEnCentavos = total * 100;
+    const moneda = 'COP';
+    const llavePublica = 'pub_test_yLLrh1Iru7WwtvMSsdBp6liEwC7ZaJiM';
 
-//   const { addDoc, collection } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-  
-//   const user = firebaseModules.auth.currentUser;
-//   if (!user) throw new Error('Usuario no autenticado');
+    const response = await fetch(
+      'https://us-central1-cafelaesperanza-231a4.cloudfunctions.net/generarFirmaWompi',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          referencia: numeroPedido,
+          monto: montoEnCentavos,
+          moneda: moneda
+        })
+      }
+    );
 
-//   const nombre = document.getElementById('nombreCliente').value.trim();
-//   const telefono = document.getElementById('telefonoCliente').value.trim();
-//   const direccion = document.getElementById('direccionCliente').value.trim();
-//   const ciudad = document.getElementById('ciudadCliente').value.trim();
-//   const notas = document.getElementById('notas').value.trim();
+    const { firma } = await response.json();
 
-//   if (!nombre || !telefono || !direccion || !ciudad) {
-//     throw new Error('Por favor completa todos los campos obligatorios');
-//   }
+    const urlPago = `https://checkout.wompi.co/p/?public-key=${llavePublica}&currency=${moneda}&amount-in-cents=${montoEnCentavos}&reference=${numeroPedido}&signature:integrity=${firma}&redirect-url=${encodeURIComponent('https://cafevaldoreco.github.io/pedidos.html')}`;
+    window.location.href = urlPago;
 
-//   const pedidoData = {
-//     uid: user.uid,
-//     datosCliente: {
-//       nombre,
-//       telefono,
-//       direccion,
-//       ciudad,
-//       email: user.email,
-//       notas: notas
-//     },
-//     pedido: carrito,
-//     total: total,
-//     fecha: new Date().toISOString(),
-//     estado: 'pendiente'
-//   };
+  } catch (error) {
+    console.error('Error abriendo Wompi:', error);
+    mostrarNotificacion('❌ Error al abrir la pasarela de pago. Intenta de nuevo.');
+  }
+}
 
-//   // 1️⃣ Guardar el pedido en Firebase
-//   console.log('💾 Guardando pedido en Firebase...');
-//   const docRef = await addDoc(collection(firebaseModules.db, "pedidos"), pedidoData);
-//   console.log("✅ Pedido guardado exitosamente con ID:", docRef.id);
-  
-//   // 2️⃣ Reducir el stock automáticamente
-//   console.log('📦 Reduciendo stock del inventario...');
-//   const resultadoStock = await reducirStockDesdePedido(pedidoData);
-  
-//   if (resultadoStock.success) {
-//     console.log('✅ Stock actualizado correctamente');
-//     console.log('   Productos vendidos:', resultadoStock.productosVendidos);
-//   } else {
-//     console.warn('⚠️ Advertencia: El stock no se actualizó:', resultadoStock.error);
-//     // No bloqueamos el pedido, solo advertimos
-//   }
-  
-//   return docRef.id;
-// }
 
 // Función guardarPedidoFirebase - VERSIÓN FINAL
-async function guardarPedidoFirebase() {
+async function guardarPedidoFirebase(metodoPago = 'contraentrega') {
   if (!firebaseModules.loaded) {
     await loadFirebase();
   }
@@ -888,7 +823,8 @@ async function guardarPedidoFirebase() {
     pedido: carrito,
     total: total,
     fecha: new Date().toISOString(),
-    estado: 'pendiente',
+    estado: metodoPago === 'wompi' ? 'pendiente-pago' : 'pendiente',
+    metodoPago: metodoPago,
     numeroPedido: 'PED' + Date.now()
   };
 

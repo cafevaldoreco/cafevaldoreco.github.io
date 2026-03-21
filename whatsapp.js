@@ -6,7 +6,7 @@ btnWhatsapp.target = '_blank';
 btnWhatsapp.rel = 'noopener noreferrer';
 btnWhatsapp.setAttribute('aria-label', 'Contactar por WhatsApp');
 
-const mensaje = "\u00A1Hola Caf\u00E9 Valdore! \u2615 Estoy interesado en sus productos. \u00BFMe pueden ayudar?";
+const mensaje = "\u00A1Hola Caf\u00E9 Valdore! Estoy interesado en sus productos. \u00BFMe pueden ayudar?";
 btnWhatsapp.href = "https://wa.me/573022881109?text=" + encodeURIComponent(mensaje);
 
 btnWhatsapp.innerHTML = `
